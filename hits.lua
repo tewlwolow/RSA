@@ -73,7 +73,7 @@ local function onAttack(--[[e]])
                 soundPath = "RSA\\hits\\rsa_gong-failed.wav",
                 reference = targetRef
             }
-            debugLog("Played failed hit sound.")
+            debugLog("Played failed hit sound (barehands).")
         end
     end
 
