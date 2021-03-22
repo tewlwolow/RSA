@@ -1,3 +1,2 @@
 # RSA
-WIP Morrowind mod
-instruments, music, magic.
+WIP Morrowind mod - instruments, music, magic.
