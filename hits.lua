@@ -3,21 +3,26 @@ local debugLogOn = config.debugLogOn
 local modversion = require("RSA\\version")
 local version = modversion.version
 local data = require("RSA\\hitsData")
+local staticNamesOn = config.staticNamesOn
 
 local hitInstruments = data.hitInstruments
 
 local function debugLog(string)
     if debugLogOn then
-       mwse.log("[RSA "..version.."]: "..string)
+       mwse.log("[RSA "..version.."] Hit instruments module: "..string)
     end
 end
 
+-- Check if the weapon is a mallet, and determine its type --
 local function isMallet(w)
-    if string.find(w.object.id:lower(), "mallet") then return true else return false end
+    if string.find(w.object.id:lower(), "bigmallet") then return "bigmallet" end
+    if string.find(w.object.id:lower(), "mallet") then return "mallet" else return false end
 end
 
+-- The following functions for statics are (heavily) inspired by Merlord's Ashfall --
 local function onAttack(--[[e]])
 
+    -- Optionally we can block other actors from playing sound, but hey, if it hits, it hits --
     --[[
     local actor = e.reference
     if (actor ~= tes3.player) then
@@ -42,26 +47,47 @@ local function onAttack(--[[e]])
         end
     end
 
-    if targetRef~=nil and targetRef.object.objectType ~= tes3.objectType.static then return end
+    -- We don't want to continue if the object is too far away or is not a static --
+    if (targetRef~=nil) and (targetRef.object.objectType ~= tes3.objectType.static) then return end
 
     if targetRef~=nil then
         debugLog("Target: "..targetRef.object.id)
+
+        -- Get the player's weapon --
         local weapon = tes3.mobilePlayer.readiedWeapon
+
+        -- If we're not barehanded --
         if weapon then
+
+            -- Check if weapon is a mallet --
             debugLog("Checking weapon: "..weapon.object.id)
-            if isMallet(weapon) == true then
+            local mallet = isMallet(weapon)
+            local malletPitch
+            if mallet ~= false then
+
                 debugLog("Detected mallet weapon.")
+                -- Set pitch per mallet type --
+                if mallet == "mallet" then
+                    malletPitch = 1.0
+                else
+                    malletPitch = 0.8
+                end
+
+                -- Check which hit instrument we're playing --
                 for rsaID, _ in pairs(hitInstruments) do
                     if string.startswith(targetRef.object.id, rsaID) then
                         tes3.playSound{
                             soundPath = "RSA\\hits\\"..rsaID..".wav",
+                            pitch = malletPitch or 1.0,
                             reference = targetRef
                         }
                         debugLog("Played hit sound: "..rsaID..".wav")
                         break
                     end
                 end
+
             else
+                -- If we don't use a mallet weapon, play metallic noise --
                 tes3.playSound{
                     soundPath = "RSA\\hits\\rsa_gong-failed.wav",
                     reference = targetRef
@@ -69,6 +95,7 @@ local function onAttack(--[[e]])
                 debugLog("Played failed hit sound.")
             end
         else
+            -- If we're barehanded, play metallic noise --
             tes3.playSound{
                 soundPath = "RSA\\hits\\rsa_gong-failed.wav",
                 reference = targetRef
@@ -79,4 +106,5 @@ local function onAttack(--[[e]])
 
 end
 
+debugLog("Module initialised.")
 event.register("attack", onAttack)

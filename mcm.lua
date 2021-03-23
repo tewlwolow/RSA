@@ -27,22 +27,22 @@ local template = mwse.mcm.createTemplate{
     }
 
     page:createYesNoButton{
-        label = "Enable tooltips? Requires Tooltips Complete.",
+        label = "Enable item tooltips? Requires Tooltips Complete.",
         variable = registerVariable("tooltipsOn"),
         restartRequired=true
     }
 
     page:createYesNoButton{
-        label = "Enable hit instruments functionality?",
+        label = "Enable playing hit instruments with mallets?\nFind a mallet (blunt weapon) and swing it at a hit instrument (f.ex. a gong) to play it. Using a different weapon will create noise.\nNote: Big mallets hit deeper notes.",
         variable = registerVariable("hitsOn"),
         restartRequired=true
     }
 
-    --[[page:createYesNoButton{
+    page:createYesNoButton{
         label = "Show names for static objects?",
         variable = registerVariable("staticNamesOn"),
         restartRequired=true
-    }]]
+    }
 
 
 template:saveOnClose(configPath, config)

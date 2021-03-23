@@ -8,7 +8,9 @@ local function init()
     local config=require("RSA.config")
     local tooltipsOn = config.tooltipsOn
     local hitsOn = config.hitsOn
+    local staticNamesOn = config.staticNamesOn
 
+    -- Load modules per config settings --
     if tooltipsOn then
         mwse.log("[RSA "..version.."] Loading file: tooltipsCompleteInterop.lua")
         dofile("Data Files\\MWSE\\mods\\RSA\\tooltipsCompleteInterop.lua")
@@ -19,9 +21,14 @@ local function init()
         dofile("Data Files\\MWSE\\mods\\RSA\\hits.lua")
     end
 
+    if staticNamesOn then
+        mwse.log("[RSA "..version.."] Loading file: staticNames.lua")
+        dofile("Data Files\\MWSE\\mods\\RSA\\staticNames.lua")
+    end
+
 end
 
--- Registers MCM menu --
+-- Register MCM menu --
 event.register("modConfigReady", function()
     dofile("Data Files\\MWSE\\mods\\RSA\\mcm.lua")
 end)
