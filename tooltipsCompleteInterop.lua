@@ -35,6 +35,10 @@ local tooltipData =
     { id = "rsa_zuileyr", description = "This wooden lute with curved, protruding frets was so popular amongst the settled Dunmer that its name literally translates as \"music thing\" or simply \"instrument\". The zuileyr's six strings - two drone strings, a double sympathetic string, and two melody strings - are more than enough to perform any piece of the poetry-inspired \"morhbaldefur\" (\"the hand above\") genre that brings together the myths and tales of all Dumner Houses."},
     { id = "rsa_zuileyr-wht", description = "This wooden lute with curved, protruding frets was so popular amongst the settled Dunmer that its name literally translates as \"music thing\" or simply \"instrument\". The zuileyr's six strings - two drone strings, a double sympathetic string, and two melody strings - are more than enough to perform any piece of the poetry-inspired \"morhbaldefur\" (\"the hand above\") genre that brings together the myths and tales of all Dunmer Houses."},
     { id = "rsa_gong-mallet1", description = "This simple mallet made of wood and leather is ideal for playing framed gongs."},
+    { id = "rsa_gong-mallet2", description = "This simple mallet made of wood and leather is ideal for playing framed gongs."},
+    { id = "rsa_gong-bigmallet1", description = "This simple mallet made of wood and leather is ideal for playing framed gongs. This bigger version is used to play deeper notes."},
+    { id = "rsa_gong-bigmallet2", description = "This simple mallet made of wood and leather is ideal for playing framed gongs. This bigger version is used to play deeper notes."},
+
 }
 
 local function initialized()
