@@ -3,7 +3,6 @@ local debugLogOn = config.debugLogOn
 local modversion = require("RSA\\version")
 local version = modversion.version
 local data = require("RSA\\hitsData")
-local staticNamesOn = config.staticNamesOn
 
 local hitInstruments = data.hitInstruments
 
