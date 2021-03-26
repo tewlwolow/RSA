@@ -52,29 +52,30 @@ local function onAttack(--[[e]])
     if targetRef~=nil then
         debugLog("Target: "..targetRef.object.id)
 
-        -- Get the player's weapon --
-        local weapon = tes3.mobilePlayer.readiedWeapon
+        -- Check which hit instrument we're playing --
+        for rsaID, _ in pairs(hitInstruments) do
+            if string.startswith(targetRef.object.id, rsaID) then
 
-        -- If we're not barehanded --
-        if weapon then
+                -- Get the player's weapon --
+                local weapon = tes3.mobilePlayer.readiedWeapon
 
-            -- Check if weapon is a mallet --
-            debugLog("Checking weapon: "..weapon.object.id)
-            local mallet = isMallet(weapon)
-            local malletPitch
-            if mallet ~= false then
+                -- If we're not barehanded --
+                if weapon then
 
-                debugLog("Detected mallet weapon.")
-                -- Set pitch per mallet type --
-                if mallet == "mallet" then
-                    malletPitch = 1.0
-                else
-                    malletPitch = 0.8
-                end
+                    -- Check if weapon is a mallet --
+                    debugLog("Checking weapon: "..weapon.object.id)
+                    local mallet = isMallet(weapon)
+                    local malletPitch
+                    if mallet ~= false then
 
-                -- Check which hit instrument we're playing --
-                for rsaID, _ in pairs(hitInstruments) do
-                    if string.startswith(targetRef.object.id, rsaID) then
+                        debugLog("Detected mallet weapon.")
+                        -- Set pitch per mallet type --
+                        if mallet == "mallet" then
+                            malletPitch = 1.0
+                        else
+                            malletPitch = 0.8
+                        end
+
                         tes3.playSound{
                             soundPath = "RSA\\hits\\"..rsaID..".wav",
                             pitch = malletPitch or 1.0,
@@ -82,24 +83,24 @@ local function onAttack(--[[e]])
                         }
                         debugLog("Played hit sound: "..rsaID..".wav")
                         break
-                    end
-                end
 
-            else
-                -- If we don't use a mallet weapon, play metallic noise --
-                tes3.playSound{
-                    soundPath = "RSA\\hits\\rsa_gong-failed.wav",
-                    reference = targetRef
-                }
-                debugLog("Played failed hit sound.")
+                    else
+                        -- If we don't use a mallet weapon, play metallic noise --
+                        tes3.playSound{
+                            soundPath = "RSA\\hits\\rsa_gong-failed.wav",
+                            reference = targetRef
+                        }
+                        debugLog("Played failed hit sound.")
+                    end
+                else
+                    -- If we're barehanded, play metallic noise --
+                    tes3.playSound{
+                        soundPath = "RSA\\hits\\rsa_gong-failed.wav",
+                        reference = targetRef
+                    }
+                    debugLog("Played failed hit sound (barehands).")
+                end
             end
-        else
-            -- If we're barehanded, play metallic noise --
-            tes3.playSound{
-                soundPath = "RSA\\hits\\rsa_gong-failed.wav",
-                reference = targetRef
-            }
-            debugLog("Played failed hit sound (barehands).")
         end
     end
 
