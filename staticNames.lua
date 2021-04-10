@@ -1,15 +1,15 @@
-local config = require("RSA.config")
+local config = require("Resdayn Sonorant Apparati.config")
 local debugLogOn = config.debugLogOn
-local modversion = require("RSA\\version")
+local modversion = require("Resdayn Sonorant Apparati\\version")
 local version = modversion.version
-local data = require("RSA\\hitsData")
 local current
 
+local data = require("Resdayn Sonorant Apparati\\data\\data")
 local hitInstruments = data.hitInstruments
 
 local function debugLog(string)
     if debugLogOn then
-       mwse.log("[RSA "..version.."] Static names module: "..string)
+       mwse.log("[Resdayn Sonorant Apparati "..version.."] Static names module: "..string)
     end
 end
 
@@ -93,9 +93,9 @@ local function staticTooltip()
 
                 if (targetRef~=nil) and (targetRef.object.objectType ~= tes3.objectType.static) then return end
 
-                for rsaID, rsaName in pairs(hitInstruments) do
-                    if string.startswith(targetRef.object.id, rsaID) then
-                        txt = rsaName
+                for _, instrument in pairs(hitInstruments) do
+                    if string.startswith(targetRef.object.id, instrument.id) then
+                        txt = instrument.name
                         current = targetRef.object.id
                     end
                 end

@@ -1,7 +1,7 @@
 local configPath = "Resdayn Sonorant Apparati"
-local config = require("RSA.config")
+local config = require("Resdayn Sonorant Apparati.config")
 mwse.loadConfig("Resdayn Sonorant Apparati")
-local modversion = require("RSA\\version")
+local modversion = require("Resdayn Sonorant Apparati\\version")
 local version = modversion.version
 
 local function registerVariable(id)

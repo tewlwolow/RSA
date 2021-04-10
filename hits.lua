@@ -1,21 +1,29 @@
-local config = require("RSA.config")
+local config = require("Resdayn Sonorant Apparati.config")
 local debugLogOn = config.debugLogOn
-local modversion = require("RSA\\version")
+local modversion = require("Resdayn Sonorant Apparati\\version")
 local version = modversion.version
-local data = require("RSA\\hitsData")
 
+local data = require("Resdayn Sonorant Apparati\\data\\data")
 local hitInstruments = data.hitInstruments
 
 local function debugLog(string)
     if debugLogOn then
-       mwse.log("[RSA "..version.."] Hit instruments module: "..string)
+       mwse.log("[Resdayn Sonorant Apparati "..version.."] Hit instruments module: "..string)
     end
 end
 
 -- Check if the weapon is a mallet, and determine its type --
 local function isMallet(w)
-    if string.find(w.object.id:lower(), "bigmallet") then return "bigmallet" end
-    if string.find(w.object.id:lower(), "mallet") then return "mallet" else return false end
+    for _, instrument in pairs(hitInstruments) do
+        if instrument.requirements ~= nil then
+            for _, req in pairs(instrument.requirements) do
+                if req.id == w.object.id:lower() then
+                    return req.type
+                end
+            end
+        end
+    end
+    return false
 end
 
 -- The following functions for statics are (heavily) inspired by Merlord's Ashfall --
@@ -53,8 +61,8 @@ local function onAttack(--[[e]])
         debugLog("Target: "..targetRef.object.id)
 
         -- Check which hit instrument we're playing --
-        for rsaID, _ in pairs(hitInstruments) do
-            if string.startswith(targetRef.object.id, rsaID) then
+        for _, instrument in pairs(hitInstruments) do
+            if string.startswith(targetRef.object.id, instrument.id) then
 
                 -- Get the player's weapon --
                 local weapon = tes3.mobilePlayer.readiedWeapon
@@ -77,11 +85,11 @@ local function onAttack(--[[e]])
                         end
 
                         tes3.playSound{
-                            soundPath = "RSA\\hits\\"..rsaID..".wav",
+                            soundPath = "RSA\\hits\\"..instrument.id..".wav",
                             pitch = malletPitch or 1.0,
                             reference = targetRef
                         }
-                        debugLog("Played hit sound: "..rsaID..".wav")
+                        debugLog("Played hit sound: "..instrument.id..".wav")
                         break
 
                     else
