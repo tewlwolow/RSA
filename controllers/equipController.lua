@@ -1,6 +1,3 @@
-local data = require("Resdayn Sonorant Apparati\\data\\data")
-local instruments = data.instruments
-
 local modversion = require("Resdayn Sonorant Apparati\\version")
 local version = modversion.version
 local config = require("Resdayn Sonorant Apparati.config")
@@ -15,7 +12,8 @@ local function debugLog(string)
 end
 
 local function onBarterOffer(e)
-    if (#e.selling > 0) and tes3.player.data.RSA.equipped ~= nil and e.success == true then
+    if tes3.player.data.RSA.equipped ~= nil and
+    #e.selling > 0 and e.success == true then
         for _, tile in ipairs(e.selling) do
             if tile.item.id == tes3.player.data.RSA.equipped then
                 debugLog("Player sold the equipped instrument - unequipping.")
@@ -24,6 +22,15 @@ local function onBarterOffer(e)
         end
     end
 end
+
+local function onItemDropped(e)
+    if tes3.player.data.RSA.equipped ~= nil and
+    e.reference.id == tes3.player.data.RSA.equipped then
+        debugLog("Player dropped the equipped instrument - unequipping.")
+        equipInstrument.unequip(tes3.player)
+    end
+end
+event.register("itemDropped", onItemDropped)
 
 -- Register equip events --
 debugLog("Registering events.")
