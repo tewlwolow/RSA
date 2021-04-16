@@ -14,19 +14,24 @@ local function debugLog(string)
     end
 end
 
+-- Faux equip instrument and show it on player mesh --
 function this.equip(ref, instrument)
     debugLog("Equipping instrument: "..instrument.name)
+    -- Get the spine node for attaching --
     local parent = ref.sceneNode:getObjectByName("Bip01 Spine1")
+
+    -- Load instrument mesh --
     local node = tes3.loadMesh(instrument.mesh)
     if node then
         node = node:clone()
         node.children[1].name = instrument.id
         node:clearTransforms()
 
-        -- rename the root node so we can easily find it for detaching
+        -- Rename the root node so we can easily find it for detaching --
         node.name = "Bip01 Attached Instrument"
 
-        -- offset the node to position the instrument correctly
+        -- Offset the node to position the instrument correctly --
+        -- Uses values defined per instrument in main data file --
         local m1 = tes3matrix33.new()
         m1:fromEulerXYZ(table.unpack(instrument.equipRotation))
         local instrumentOffset = {
@@ -40,13 +45,14 @@ function this.equip(ref, instrument)
         parent:update()
         parent:updateNodeEffects()
 
+        -- Store the equipped id for other modules to use --
         tes3.player.data.RSA.equipped = instrument.id
     end
     debugLog(instrument.name.." equipped.")
 
 end
 
-
+-- Unequip instrument if equipping the same instrument twice --
 function this.unequip(ref)
     local parent = ref.sceneNode:getObjectByName("Bip01 Spine1")
     local node = parent:getObjectByName("Bip01 Attached Instrument")
@@ -59,6 +65,8 @@ function this.unequip(ref)
     debugLog("Instrument unequipped.")
 end
 
+-- Main logic loop for equip event --
+-- We need to determine if we need to equip or unequip --
 function this.onEquip(e)
     local ref = e.reference
     if  tes3.player.data.RSA.equipped == nil then
@@ -85,6 +93,7 @@ function this.onEquip(e)
     end
 end
 
+-- Check if the saved game has any instrument attached and attach if necessary --
 function this.getEquipData()
     local equippedData, equippedInstrument
     equippedData = tes3.player.data.RSA.equipped

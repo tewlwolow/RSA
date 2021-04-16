@@ -19,6 +19,7 @@ local function debugLog(string)
     end
 end
 
+-- Image buttons from UI Expansion --
 function ImageButton.over(e)
 	if (not e.widget.disabled) then
 		e.widget.color = { 0.3, 0.3, 0.3 }
@@ -76,11 +77,15 @@ function ImageButton.create(parent, imagePath, w, h)
 	return background
 end
 
+-- Main RSA menu --
 local RSAMenuID = tes3ui.registerID("RSA:Menu")
 local function createMenu(e)
     if e.isAltDown then
         debugLog("Creating RSA Menu.")
+        -- Get the player mesh to restore controls later --
         playerMesh = tes3.player.object.mesh
+
+        -- Check if we have equipped an RSA instrument, return if false --
         equippedData = tes3.player.data.RSA.equipped
         local node = tes3.player.sceneNode:getObjectByName("Bip01 Attached Instrument")
         if node == nil then
@@ -95,6 +100,7 @@ local function createMenu(e)
             end
         end
 
+        -- Check the flag, otherwise it somehow triggers twice --
         if RSAmenuCreated ~= 1 then
             RSAmenuCreated = 1
             local RSAMenu = tes3ui.createMenu{ id = RSAMenuID, fixedFrame = true }
@@ -140,6 +146,7 @@ local function createMenu(e)
 
             local improvIconPath = menuElementsPath.."rsa_improvico.dds"
 
+            -- Create button callbacks for improvisation menu--
             local improvButton = ImageButton.create(borderImprov, menuElementsPath.."rsa_improvbg.dds", 128, 128)
             improvButton:register("mouseClick", function()
                 tes3ui.leaveMenuMode()
@@ -170,7 +177,7 @@ local function createMenu(e)
                             tes3ui.leaveMenuMode()
                             improvMenu:destroy()
                             improvMenuCreated = 0
-                            tes3.messageBox("Playing mode: "..mode.name..": "..mode.description)
+                            --tes3.messageBox("Playing mode: "..mode.name..": "..mode.description)
 
                             animController.startImprovCycle(equippedInstrument, playerMesh, tes3.player)
 
@@ -187,6 +194,7 @@ local function createMenu(e)
             borderImprov.height = 136
             --
 
+            -- Create button callbacks for composition menu --
             local optionComposition = optionsBlock:createBlock{id = tes3ui.registerID("RSA:Menu_OptionComposition")}
             optionComposition.width = 180
             optionComposition.autoHeight = true
