@@ -14,6 +14,21 @@ local function debugLog(string)
     end
 end
 
+local function setControlsDisabled(state)
+    tes3.mobilePlayer.controlsDisabled = state
+    tes3.mobilePlayer.jumpingDisabled = state
+    tes3.mobilePlayer.attackDisabled = state
+    tes3.mobilePlayer.magicDisabled = state
+    tes3.mobilePlayer.mouseLookDisabled = state
+end
+local function disableControls()
+    setControlsDisabled(true)
+end
+local function enableControls()
+    setControlsDisabled(false)
+    tes3.runLegacyScript{command = "EnableInventoryMenu"}
+end
+
 -- Cancel animation by forcing the idle animation on actor --
 function this.cancelAnimation(e, playerMesh, instrument, actor)
     if e.isAltDown then
@@ -35,6 +50,9 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
         tes3.player.data.RSA.equipped = nil
         equipInstrument.equip(actor, instrument)
         equipInstrument.restoreEquipped(actor)
+
+        tes3.setVanityMode({ enabled = false })
+        enableControls()
     end
 end
 
@@ -49,7 +67,6 @@ function this.playAnimation(instrument, actor, start, animType, animGroup)
         startFlag = start,
     })
 
-    equipInstrument.restoreEquipped(actor)
 end
 
 -- Attach instrument for idle and play animations --
@@ -84,6 +101,15 @@ end
 -- The improvisation animation cycle - equip, then idle loop --
 function this.startImprovCycle(instrument, playerMesh, actor)
 
+    tes3.setVanityMode({ enabled = true })
+    disableControls()
+
+    -- Register instrument attachment on idle animation --
+    attachCallback = function(e)
+    this.attachInstrument(e, instrument, actor)
+    end
+    event.register("playGroup", attachCallback)
+
     -- Register alt+c to break the animation cycle --
     cancelCallback = function(e)
     this.cancelAnimation(e, playerMesh, instrument, actor)
@@ -92,18 +118,18 @@ function this.startImprovCycle(instrument, playerMesh, actor)
     event.register("key", cancelCallback, cancelOptions)
 
     -- Play the equip animation --
-    this.playAnimation(instrument, actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle9)
+    this.playAnimation(instrument, actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle8)
 
 
-    -- Wait one frame then register idle animation --
-    timer.delayOneFrame(function()
-        attachCallback = function(e)
-        this.attachInstrument(e, instrument, actor)
-        end
-        event.register("playGroup", attachCallback)
-        -- Play idle animation after equip --
-        --this.playAnimation(instrument, actor, tes3.animationStartFlag.normal, instrument.animation.idle, tes3.animationGroup.idle9)
-    end)
+    -- Wait some then play the idle animation --
+    timer.start{
+        duration = 0.7,
+        callback=function()
+            this.playAnimation(instrument, actor, tes3.animationStartFlag.immediate, instrument.animation.idle, tes3.animationGroup.idle9)
+        end,
+        type = timer.simulate
+    }
+
 
 end
 
