@@ -33,6 +33,25 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
         local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
         tes3.player.data.RSA.equipped = nil
         equipInstrument.equip(actor, instrument)
+
+        -- Reequip all the items to restore the nodes - paramount for Weapon Sheating, Ashfall, Vanity etc. --
+        local equippedStack = actor.object.equipment
+        for _, equipped in pairs(equippedStack) do
+            print(equipped.object.name)
+            timer.delayOneFrame(function()
+                actor.mobile:unequip({item = equipped.object.id})
+            end)
+        end
+        local inventory = tes3.player.object.inventory
+        for _, equipped in pairs(equippedStack) do
+            for _, inventoryItem in pairs(inventory) do
+                if equipped.object.id == inventoryItem.object.id then
+                    timer.delayOneFrame(function()
+                        actor.mobile:equip({item = inventoryItem.object.id})
+                    end)
+                end
+            end
+        end
     end
 end
 
