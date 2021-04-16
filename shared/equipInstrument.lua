@@ -10,7 +10,7 @@ local debugLogOn = config.debugLogOn
 
 local function debugLog(string)
     if debugLogOn then
-       mwse.log("[Resdayn Sonorant Apparati "..version.."] Equip Controller: "..string)
+       mwse.log("[Resdayn Sonorant Apparati "..version.."] Equip Instrument: "..string)
     end
 end
 
@@ -38,13 +38,13 @@ end
 
 -- Faux equip instrument and show it on player mesh --
 function this.equip(ref, instrument)
-    debugLog("Equipping instrument: "..instrument.name)
     -- Get the spine node for attaching --
     local parent = ref.sceneNode:getObjectByName("Bip01 Spine1")
 
     -- Load instrument mesh --
     local node = tes3.loadMesh(instrument.mesh)
     if node then
+        debugLog("Equipping instrument: "..instrument.name)
         node = node:clone()
         node.children[1].name = instrument.id
         node:clearTransforms()
@@ -69,8 +69,8 @@ function this.equip(ref, instrument)
 
         -- Store the equipped id for other modules to use --
         tes3.player.data.RSA.equipped = instrument.id
+        debugLog(instrument.name.." equipped.")
     end
-    debugLog(instrument.name.." equipped.")
 
 end
 
@@ -117,17 +117,19 @@ end
 
 -- Check if the saved game has any instrument attached and attach if necessary --
 function this.getEquipData()
-    local equippedData, equippedInstrument
-    equippedData = tes3.player.data.RSA.equipped
-    if tes3.player.data.RSA ~= nil then
-        for _, instrument in pairs(data.instruments) do
-            if equippedData == instrument.id then
-                equippedInstrument = instrument
-                break
+    timer.delayOneFrame(function()
+        local equippedData, equippedInstrument
+        equippedData = tes3.player.data.RSA.equipped
+        if equippedData ~= nil then
+            for _, instrument in pairs(data.instruments) do
+                if equippedData == instrument.id then
+                    equippedInstrument = instrument
+                    this.equip(tes3.player, equippedInstrument)
+                    break
+                end
             end
         end
-        this.equip(tes3.player, equippedInstrument)
-    end
+    end)
 end
 
 

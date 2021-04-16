@@ -9,7 +9,7 @@ local function init()
     local function getData()
         tes3.player.data.RSA = tes3.player.data.RSA or {}
     end
-    event.register("loaded", getData)
+    event.register("loaded", getData, {priority = 50})
 
     -- Get proper data structure - create paths for modes and riffs per culture --
     local data = require("Resdayn Sonorant Apparati\\data\\data")
@@ -39,11 +39,8 @@ local function init()
     dofile("Data Files\\MWSE\\mods\\Resdayn Sonorant Apparati\\controllers\\UIController.lua")
 
     -- Load main equip functionalities --
-    mwse.log("[Resdayn Sonorant Apparati "..version.."] Loading file: equipInstrument.lua")
-    local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
-    -- Register equip events --
-    event.register("loaded", equipInstrument.getEquipData)
-    event.register("equip", equipInstrument.onEquip)
+    mwse.log("[Resdayn Sonorant Apparati "..version.."] Loading file: equipController.lua")
+    dofile("Data Files\\MWSE\\mods\\Resdayn Sonorant Apparati\\controllers\\equipController.lua")
 
     -- Load modules per config settings --
 

@@ -91,7 +91,7 @@ local function createMenu(e)
             -- Check if we have equipped an RSA instrument, return if false --
             equippedData = tes3.player.data.RSA.equipped
             local node = tes3.player.sceneNode:getObjectByName("Bip01 Attached Instrument")
-            if node == nil then
+            if node == nil or equippedData == nil then
                 tes3.messageBox("You haven't got any instrument equipped.")
                 return
             else
