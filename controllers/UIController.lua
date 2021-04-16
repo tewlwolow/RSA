@@ -81,31 +81,32 @@ end
 local RSAMenuID = tes3ui.registerID("RSA:Menu")
 local function createMenu(e)
     if e.isAltDown then
-        debugLog("Creating RSA Menu.")
-        -- Get the player mesh to restore controls later --
-        playerMesh = tes3.player.object.mesh
-
-        -- Check if we have equipped an RSA instrument, return if false --
-        equippedData = tes3.player.data.RSA.equipped
-        local node = tes3.player.sceneNode:getObjectByName("Bip01 Attached Instrument")
-        if node == nil then
-            tes3.messageBox("You haven't got any instrument equipped.")
-            return
-        else
-            for _, instrument in pairs(data.instruments) do
-                if equippedData == instrument.id then
-                    equippedInstrument = instrument
-                    break
-                end
-            end
-        end
-
         -- Check the flag, otherwise it somehow triggers twice --
         if RSAmenuCreated ~= 1 then
-            RSAmenuCreated = 1
+
+            debugLog("Creating RSA Menu.")
+            -- Get the player mesh to restore controls later --
+            playerMesh = tes3.player.object.mesh
+
+            -- Check if we have equipped an RSA instrument, return if false --
+            equippedData = tes3.player.data.RSA.equipped
+            local node = tes3.player.sceneNode:getObjectByName("Bip01 Attached Instrument")
+            if node == nil then
+                tes3.messageBox("You haven't got any instrument equipped.")
+                return
+            else
+                for _, instrument in pairs(data.instruments) do
+                    if equippedData == instrument.id then
+                        equippedInstrument = instrument
+                        break
+                    end
+                end
+            end
+
             local RSAMenu = tes3ui.createMenu{ id = RSAMenuID, fixedFrame = true }
             RSAMenu:getContentElement().childAlignX = 0.5
             tes3ui.enterMenuMode(RSAMenuID)
+            RSAmenuCreated = 1
 
             local equippedName = equippedInstrument.name
             local title = RSAMenu:createLabel{id = tes3ui.registerID("RSA:Menu_Title"), text = equippedName}
