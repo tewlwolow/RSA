@@ -5,9 +5,19 @@ local RSAmenuCreated = 0
 local improvMenuCreated = 0
 local menuElementsPath = "Icons\\RSA\\ui\\menu\\"
 
-local playerMesh
+local playerMesh, equippedData, equippedInstrument
 
 local ImageButton = {}
+
+local modversion = require("Resdayn Sonorant Apparati\\version")
+local version = modversion.version
+local config = require("Resdayn Sonorant Apparati.config")
+local debugLogOn = config.debugLogOn
+local function debugLog(string)
+    if debugLogOn then
+       mwse.log("[Resdayn Sonorant Apparati "..version.."] Main UI Controller: "..string)
+    end
+end
 
 function ImageButton.over(e)
 	if (not e.widget.disabled) then
@@ -69,25 +79,22 @@ end
 local RSAMenuID = tes3ui.registerID("RSA:Menu")
 local function createMenu(e)
     if e.isAltDown then
-
-        local equippedInstrument
+        playerMesh = tes3.player.object.mesh
+        equippedData = tes3.player.data.RSA.equipped
         local node = tes3.player.sceneNode:getObjectByName("Bip01 Attached Instrument")
         if node == nil then
             tes3.messageBox("You haven't got any instrument equipped.")
             return
         else
-            for _, child in pairs(node.children) do
-                for _, instrument in pairs(data.instruments) do
-                    if child.name == instrument.id then
-                        equippedInstrument = instrument
-                        break
-                    end
+            for _, instrument in pairs(data.instruments) do
+                if equippedData == instrument.id then
+                    equippedInstrument = instrument
+                    break
                 end
             end
         end
 
         if RSAmenuCreated ~= 1 then
-            playerMesh = tes3.player.object.mesh
             RSAmenuCreated = 1
             local RSAMenu = tes3ui.createMenu{ id = RSAMenuID, fixedFrame = true }
             RSAMenu:getContentElement().childAlignX = 0.5
@@ -155,20 +162,6 @@ local function createMenu(e)
 
                     ---- TODO - experimental stuff !!! -----
 
-                    local function cancelAnim(e)
-                        if e.isAltDown then
-                            tes3.playAnimation({
-                                reference = tes3.player,
-                                mesh = playerMesh,
-                                group = tes3.animationGroup.idle,
-                                startFlag = 1
-                            })
-                            event.unregister("key", cancelAnim, {filter = tes3.scanCode.x})
-                        end
-                    end
-                    event.register("key", cancelAnim, {filter = tes3.scanCode.x})
-                    print(equippedInstrument.animation.idle)
-
                     for _, mode in pairs(equippedInstrument.modes) do
                         local modeButton = modeBlock:createButton{
                             id = modeButtonID,
@@ -180,18 +173,9 @@ local function createMenu(e)
                             improvMenuCreated = 0
                             tes3.messageBox("Playing mode: "..mode.name..": "..mode.description)
 
-                            tes3.playAnimation({
-                                reference = tes3.player,
-                                group = tes3.animationGroup.idle9,
-                                mesh = equippedInstrument.animation.idle,
-                                startFlag = tes3.animationStartFlag.immediate,
-                            })
+                            animController.playAnimation(equippedInstrument, playerMesh, tes3.player)
 
-                            --[[animController.startImprovCycle(equippedInstrument)
-                            event.register("key", function ()
-                                animController.cancelAnim(playerMesh)
-                            end,
-                                {filter = tes3.scanCode.x})]]
+                            --animController.startImprovCycle(equippedInstrument)
                         end)
                     end
                 end

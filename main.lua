@@ -3,7 +3,13 @@
 local modversion = require("Resdayn Sonorant Apparati.version")
 local version = modversion.version
 
+local function getData()
+    tes3.player.data.RSA = tes3.player.data.RSA or {}
+end
+
 local function init()
+
+    event.register("loaded", getData)
 
     mwse.log("[Resdayn Sonorant Apparati] Resdayn Sonorant Apparati version "..version.." initialised.")
 

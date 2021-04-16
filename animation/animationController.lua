@@ -1,79 +1,92 @@
 local this = {}
 
-function this.cancelAnim(e, playerMesh)
+local modversion = require("Resdayn Sonorant Apparati\\version")
+local version = modversion.version
+local config = require("Resdayn Sonorant Apparati.config")
+local debugLogOn = config.debugLogOn
+local function debugLog(string)
+    if debugLogOn then
+       mwse.log("[Resdayn Sonorant Apparati "..version.."] Animation Controller: "..string)
+    end
+end
+
+function this.cancelAnimation(e, playerMesh, instrument, actor)
     if e.isAltDown then
+        debugLog("Cancelling animation, player mesh: "..playerMesh)
         tes3.playAnimation({
-            reference = tes3.player,
+            reference = actor,
             mesh = playerMesh,
             group = tes3.animationGroup.idle,
             startFlag = 1
         })
-        event.unregister("key", this.cancelAnim, {filter = tes3.scanCode.x})
+
+        local equipInstrument = require("Resdayn Sonorant Apparati\\action\\equipInstrument")
+        tes3.player.data.RSA.equipped = nil
+        equipInstrument.equip(actor, instrument)
     end
+    event.unregister("key", this.cancelAnimation())
 end
 
-function this.playAnim(instrument)
+function this.playAnimation(instrument, playerMesh, actor, start, animType)
+    debugLog("Playing animation for instrument: "..instrument.name)
+    event.register("key", function (e)
+        this.cancelAnimation(e, playerMesh, instrument, actor)
+    end,
+        {filter = tes3.scanCode.x}
+    )
 
     tes3.playAnimation({
-        reference = tes3.player,
+        reference = actor,
         group = tes3.animationGroup.idle9,
-        mesh = "",
-        startFlag = tes3.animationStartFlag.immediate,
+        mesh = animType,
+        startFlag = start,
     })
 
-
-    local ins = tes3.loadMesh(instrument.mesh):clone()
-    ins.name = instrument.name
-    local node = tes3.player.sceneNode:getObjectByName("Attach Instrument")
+    --[[local node = actor.sceneNode:getObjectByName("Attach Instrument")
     if node ~= nil then
+        local ins = tes3.loadMesh(instrument.mesh):clone()
+        ins.name = instrument.name
         ins:clearTransforms()
-        tes3.player.sceneNode
+        actor.sceneNode
         :getObjectByName("Attach Instrument")
         :attachChild(ins, true)
         ins.appCulled = false
+        debugLog("Attached instrument node: "..instrument.mesh)
     else
-        mwse.log("[Resdayn Sonorant Apparati] Attach Instrument node is nil!")
-    end
+        debugLog("[Resdayn Sonorant Apparati] Attach Instrument node is nil!")
+    end]]
 
 end
 
-function this.attachInstrument(e, instrument)
+function this.attachInstrument(e, instrument, actor)
 
     if e.group == tes3.animationGroup.idle9 then
-        local ins = tes3.loadMesh(instrument.mesh):clone()
-        ins.name = instrument.name
-        local node = tes3.player.sceneNode:getObjectByName("Attach Instrument")
+        local node = actor.sceneNode:getObjectByName("Attach Instrument")
         if node ~= nil then
+            local ins = tes3.loadMesh(instrument.mesh):clone()
+            ins.name = instrument.name
             ins:clearTransforms()
-            tes3.player.sceneNode
+            actor.sceneNode
             :getObjectByName("Attach Instrument")
             :attachChild(ins, true)
             ins.appCulled = false
+            debugLog("Attached instrument node: "..instrument.mesh)
         else
-            mwse.log("[Resdayn Sonorant Apparati] Attach Instrument node is nil!")
+            debugLog("[Resdayn Sonorant Apparati] Attach Instrument node is nil!")
         end
         event.unregister("playGroup", this.attachInstrument)
     end
 
 end
 
-function this.startImprovCycle(instrument)
-    tes3.playAnimation({
-        reference = tes3.player,
-        group = tes3.animationGroup.idle9,
-        mesh = instrument.animation.idle,
-        startFlag = tes3.animationStartFlag.immediate,
-    })
+function this.startImprovCycle(instrument, playerMesh, actor)
+
+    this.playAnimation(instrument, playerMesh, actor, tes3.animationStartFlag.immediate, instrument.animation.equip)
 
     timer.delayOneFrame(function()
-        tes3.playAnimation({
-            reference = tes3.player,
-            group = tes3.animationGroup.idle9,
-            mesh = instrument.animation.idle,
-            startFlag = tes3.animationStartFlag.normal,
-        })
-        event.register("playGroup", function ()
-            this.attachInstrument(instrument)
+        this.playAnimation(instrument, playerMesh, actor, tes3.animationStartFlag.normal, instrument.animation.idle)
+        event.register("playGroup", function (e)
+            this.attachInstrument(e, instrument, actor)
         end)
     end)
 
