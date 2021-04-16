@@ -4,6 +4,8 @@ local modversion = require("Resdayn Sonorant Apparati\\version")
 local version = modversion.version
 local config = require("Resdayn Sonorant Apparati.config")
 local debugLogOn = config.debugLogOn
+local callback, options
+
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[Resdayn Sonorant Apparati "..version.."] Animation Controller: "..string)
@@ -19,42 +21,23 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
             group = tes3.animationGroup.idle,
             startFlag = 1
         })
-
-        local equipInstrument = require("Resdayn Sonorant Apparati\\action\\equipInstrument")
+        event.unregister("key", callback, options)
+        local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
         tes3.player.data.RSA.equipped = nil
         equipInstrument.equip(actor, instrument)
     end
-    event.unregister("key", this.cancelAnimation())
 end
 
-function this.playAnimation(instrument, playerMesh, actor, start, animType)
+
+function this.playAnimation(instrument, actor, start, animType, animGroup)
     debugLog("Playing animation for instrument: "..instrument.name)
-    event.register("key", function (e)
-        this.cancelAnimation(e, playerMesh, instrument, actor)
-    end,
-        {filter = tes3.scanCode.x}
-    )
 
     tes3.playAnimation({
         reference = actor,
-        group = tes3.animationGroup.idle9,
+        group = animGroup,
         mesh = animType,
         startFlag = start,
     })
-
-    --[[local node = actor.sceneNode:getObjectByName("Attach Instrument")
-    if node ~= nil then
-        local ins = tes3.loadMesh(instrument.mesh):clone()
-        ins.name = instrument.name
-        ins:clearTransforms()
-        actor.sceneNode
-        :getObjectByName("Attach Instrument")
-        :attachChild(ins, true)
-        ins.appCulled = false
-        debugLog("Attached instrument node: "..instrument.mesh)
-    else
-        debugLog("[Resdayn Sonorant Apparati] Attach Instrument node is nil!")
-    end]]
 
 end
 
@@ -72,7 +55,7 @@ function this.attachInstrument(e, instrument, actor)
             ins.appCulled = false
             debugLog("Attached instrument node: "..instrument.mesh)
         else
-            debugLog("[Resdayn Sonorant Apparati] Attach Instrument node is nil!")
+            debugLog("Attach Instrument node is nil!")
         end
         event.unregister("playGroup", this.attachInstrument)
     end
@@ -81,13 +64,19 @@ end
 
 function this.startImprovCycle(instrument, playerMesh, actor)
 
-    this.playAnimation(instrument, playerMesh, actor, tes3.animationStartFlag.immediate, instrument.animation.equip)
+    callback = function(e)
+    this.cancelAnimation(e, playerMesh, instrument, actor)
+    end
+    options = { filter = tes3.scanCode.x }
+    event.register("key", callback, options)
+
+    this.playAnimation(instrument, actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle8)
 
     timer.delayOneFrame(function()
-        this.playAnimation(instrument, playerMesh, actor, tes3.animationStartFlag.normal, instrument.animation.idle)
         event.register("playGroup", function (e)
             this.attachInstrument(e, instrument, actor)
         end)
+        this.playAnimation(instrument, actor, tes3.animationStartFlag.normal, instrument.animation.idle, tes3.animationGroup.idle9)
     end)
 
 end

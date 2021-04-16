@@ -1,5 +1,5 @@
 local data = require("Resdayn Sonorant Apparati\\data\\data")
-local animController = require("Resdayn Sonorant Apparati\\animation\\animationController")
+local animController = require("Resdayn Sonorant Apparati\\controllers\\animationController")
 
 local RSAmenuCreated = 0
 local improvMenuCreated = 0
@@ -79,6 +79,7 @@ end
 local RSAMenuID = tes3ui.registerID("RSA:Menu")
 local function createMenu(e)
     if e.isAltDown then
+        debugLog("Creating RSA Menu.")
         playerMesh = tes3.player.object.mesh
         equippedData = tes3.player.data.RSA.equipped
         local node = tes3.player.sceneNode:getObjectByName("Bip01 Attached Instrument")
@@ -160,8 +161,6 @@ local function createMenu(e)
 
                     local modeButtonID = tes3ui.registerID("RSA:ImprovMenu_ModeButton")
 
-                    ---- TODO - experimental stuff !!! -----
-
                     for _, mode in pairs(equippedInstrument.modes) do
                         local modeButton = modeBlock:createButton{
                             id = modeButtonID,
@@ -173,18 +172,12 @@ local function createMenu(e)
                             improvMenuCreated = 0
                             tes3.messageBox("Playing mode: "..mode.name..": "..mode.description)
 
-                            animController.playAnimation(equippedInstrument, playerMesh, tes3.player)
+                            animController.startImprovCycle(equippedInstrument, playerMesh, tes3.player)
 
-                            --animController.startImprovCycle(equippedInstrument)
                         end)
                     end
                 end
             end)
-
-            --[[
-                event.register("key", cancelAnim, {filter = tes3.scanCode.x})
-                event.unregister("key", cancelAnim, {filter = tes3.scanCode.x})
-            ]]
 
             local improvIcon = borderImprov:createImage{path = improvIconPath}
             improvIcon.consumeMouseEvents = false
@@ -259,18 +252,6 @@ local function createMenu(e)
 
         end
     end
-
-            --
-            --[[for name, mesh in pairs(insMeshes) do
-
-                button:register("mouseClick", function()
-                    tes3ui.leaveMenuMode()
-                    menu:destroy()
-                    RSAmenuCreated = 0
-                    playAnim(name, mesh)
-                end)
-
-            end]]
-        end
+end
 
 event.register("key", createMenu, {filter = tes3.scanCode.n})

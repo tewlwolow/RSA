@@ -100,9 +100,4 @@ function this.getEquipData()
 end
 
 
-event.register("loaded", this.getEquipData)
-
-event.register("equip", this.onEquip)
-
-
 return this

@@ -1474,20 +1474,6 @@ this.instruments = {
 
 }
 
-local i = 0
-for _, instrument in pairs(this.instruments) do
-    for _, mode in pairs(this.modes[instrument.culture]) do
-        local spacelessModeName = mode.name:gsub("%s+", "")
-        local specelessInstrumentType = instrument.type:gsub("%s+", ""):lower()
-        i = i + 1
-        instrument.modes[i].name = mode.name
-        instrument.modes[i].description = mode.description
-        instrument.modes[i].riff1 = "RSA//"..instrument.culture.."//"..specelessInstrumentType.."//modes//"..mode.name.."//rsa_"..instrument.type:lower().."_"..spacelessModeName:lower().."1.wav"
-        instrument.modes[i].riff2 = "RSA//"..instrument.culture.."//"..specelessInstrumentType.."//modes//"..mode.name.."//rsa_"..instrument.type:lower().."_"..spacelessModeName:lower().."2.wav"
-        instrument.modes[i].riff3 = "RSA//"..instrument.culture.."//"..specelessInstrumentType.."//modes//"..mode.name.."//rsa_"..instrument.type:lower().."_"..spacelessModeName:lower().."3.wav"
-    end
-    i = 0
-end
 
 --[[
 -- Let's check if we didn't fuck up big time.
