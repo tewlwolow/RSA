@@ -6,6 +6,8 @@ local config = require("Resdayn Sonorant Apparati.config")
 local debugLogOn = config.debugLogOn
 local cancelCallback, cancelOptions, attachCallback
 
+local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
+
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[Resdayn Sonorant Apparati "..version.."] Animation Controller: "..string)
@@ -30,28 +32,9 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
         -- Reequip nodes that get removed when we play our animation --
 
         -- Reequip the instrument --
-        local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
         tes3.player.data.RSA.equipped = nil
         equipInstrument.equip(actor, instrument)
-
-        -- Reequip all the items to restore the nodes - paramount for Weapon Sheating, Ashfall, Vanity etc. --
-        local equippedStack = actor.object.equipment
-        for _, equipped in pairs(equippedStack) do
-            print(equipped.object.name)
-            timer.delayOneFrame(function()
-                actor.mobile:unequip({item = equipped.object.id})
-            end)
-        end
-        local inventory = tes3.player.object.inventory
-        for _, equipped in pairs(equippedStack) do
-            for _, inventoryItem in pairs(inventory) do
-                if equipped.object.id == inventoryItem.object.id then
-                    timer.delayOneFrame(function()
-                        actor.mobile:equip({item = inventoryItem.object.id})
-                    end)
-                end
-            end
-        end
+        equipInstrument.restoreEquipped(actor)
     end
 end
 
@@ -66,13 +49,14 @@ function this.playAnimation(instrument, actor, start, animType, animGroup)
         startFlag = start,
     })
 
+    equipInstrument.restoreEquipped(actor)
 end
 
 -- Attach instrument for idle and play animations --
 function this.attachInstrument(e, instrument, actor)
-
     -- We only care about idle and play animations, so we use idle9 group --
     if e.group == tes3.animationGroup.idle9 then
+        debugLog("Attaching instrument.")
         -- Get the specific node from animation file --
         local node = actor.sceneNode:getObjectByName("Attach Instrument")
         if node ~= nil then
@@ -92,6 +76,7 @@ function this.attachInstrument(e, instrument, actor)
         end
         event.unregister("playGroup", attachCallback)
         attachCallback = nil
+        debugLog("Instrument attached.")
     end
 
 end
@@ -107,7 +92,8 @@ function this.startImprovCycle(instrument, playerMesh, actor)
     event.register("key", cancelCallback, cancelOptions)
 
     -- Play the equip animation --
-    this.playAnimation(instrument, actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle8)
+    this.playAnimation(instrument, actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle9)
+
 
     -- Wait one frame then register idle animation --
     timer.delayOneFrame(function()
@@ -116,7 +102,7 @@ function this.startImprovCycle(instrument, playerMesh, actor)
         end
         event.register("playGroup", attachCallback)
         -- Play idle animation after equip --
-        this.playAnimation(instrument, actor, tes3.animationStartFlag.normal, instrument.animation.idle, tes3.animationGroup.idle9)
+        --this.playAnimation(instrument, actor, tes3.animationStartFlag.normal, instrument.animation.idle, tes3.animationGroup.idle9)
     end)
 
 end

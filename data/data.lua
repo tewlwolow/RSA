@@ -104,8 +104,8 @@ this.animations = {
     },
     ["lute"] =
     {
-        equip = "RSA\\anims\\lute\\luteEquip2.nif",
-        idle = "RSA\\anims\\lute\\luteIdle.nif",
+        equip = "RSA\\anims\\lute\\tew_luteIdle.nif",
+        idle = "RSA\\anims\\lute\\tew_luteIdle.nif",
         playRiff1 = "RSA\\anims\\",
         playRiff2 = "RSA\\anims\\",
         playRiff3 = "RSA\\anims\\",

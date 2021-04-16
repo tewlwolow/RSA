@@ -14,6 +14,28 @@ local function debugLog(string)
     end
 end
 
+-- Reequip all the items to restore the nodes - paramount for Weapon Sheating, Ashfall, Vanity etc. --
+function this.restoreEquipped(actor)
+    debugLog("Reequipping items.")
+    local equippedStack = actor.object.equipment
+    for _, equipped in pairs(equippedStack) do
+        timer.delayOneFrame(function()
+            actor.mobile:unequip({item = equipped.object.id})
+        end)
+    end
+    local inventory = tes3.player.object.inventory
+    for _, equipped in pairs(equippedStack) do
+        for _, inventoryItem in pairs(inventory) do
+            if equipped.object.id == inventoryItem.object.id then
+                timer.delayOneFrame(function()
+                    actor.mobile:equip({item = inventoryItem.object.id})
+                end)
+            end
+        end
+    end
+    debugLog("Item reequipped.")
+end
+
 -- Faux equip instrument and show it on player mesh --
 function this.equip(ref, instrument)
     debugLog("Equipping instrument: "..instrument.name)
