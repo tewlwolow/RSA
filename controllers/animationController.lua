@@ -50,16 +50,15 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
         tes3.player.data.RSA.equipped = nil
         equipInstrument.equip(actor, instrument)
         equipInstrument.restoreEquipped(actor)
-
-        tes3.setVanityMode({ enabled = false })
+        tes3.player.data.RSA.improvMode = false
+        tes3.setVanityMode({enabled = false})
         enableControls()
     end
 end
 
 -- Generic playAnimation function --
-function this.playAnimation(instrument, actor, start, animType, animGroup)
-    debugLog("Playing animation for instrument: "..instrument.name)
-
+function this.playAnimation(actor, start, animType, animGroup)
+    debugLog("Playing animation for instrument: "..tes3.player.data.RSA.equipped)
     tes3.playAnimation({
         reference = actor,
         group = animGroup,
@@ -70,9 +69,7 @@ function this.playAnimation(instrument, actor, start, animType, animGroup)
 end
 
 -- Attach instrument for idle and play animations --
-function this.attachInstrument(e, instrument, actor)
-    -- We only care about idle and play animations, so we use idle9 group --
-    if e.group == tes3.animationGroup.idle9 then
+function this.attachInstrument(instrument, actor)
         debugLog("Attaching instrument.")
         -- Get the specific node from animation file --
         local node = actor.sceneNode:getObjectByName("Attach Instrument")
@@ -91,24 +88,22 @@ function this.attachInstrument(e, instrument, actor)
         else
             debugLog("Attach Instrument node is nil!")
         end
-        event.unregister("playGroup", attachCallback)
-        attachCallback = nil
+        --[[event.unregister("playGroup", attachCallback)
+        attachCallback = nil]]
         debugLog("Instrument attached.")
-    end
-
 end
 
 -- The improvisation animation cycle - equip, then idle loop --
 function this.startImprovCycle(instrument, playerMesh, actor)
-
-    tes3.setVanityMode({ enabled = true })
+    tes3.player.data.RSA.improvMode = true
+    tes3.force3rdPerson()
     disableControls()
 
     -- Register instrument attachment on idle animation --
-    attachCallback = function(e)
+    --[[attachCallback = function(e)
     this.attachInstrument(e, instrument, actor)
     end
-    event.register("playGroup", attachCallback)
+    event.register("playGroup", attachCallback)]]
 
     -- Register alt+c to break the animation cycle --
     cancelCallback = function(e)
@@ -118,14 +113,15 @@ function this.startImprovCycle(instrument, playerMesh, actor)
     event.register("key", cancelCallback, cancelOptions)
 
     -- Play the equip animation --
-    this.playAnimation(instrument, actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle8)
+    this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle8)
 
 
     -- Wait some then play the idle animation --
     timer.start{
         duration = 0.7,
         callback=function()
-            this.playAnimation(instrument, actor, tes3.animationStartFlag.immediate, instrument.animation.idle, tes3.animationGroup.idle9)
+            this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.idle, tes3.animationGroup.idle9)
+            this.attachInstrument(instrument, actor)
         end,
         type = timer.simulate
     }

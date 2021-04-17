@@ -14,6 +14,23 @@ local function debugLog(string)
     end
 end
 
+-- Get the instrument object from data file per stored equipped instrument id --
+function this.getEquippedInstrument()
+    if tes3.player.data.RSA.equipped then
+        local equippedData = tes3.player.data.RSA.equipped
+        local node = tes3.player.sceneNode:getObjectByName("Bip01 Attached Instrument")
+        if node == nil or equippedData == nil then
+            return nil
+        else
+            for _, instrument in pairs(data.instruments) do
+                if equippedData == instrument.id then
+                    return instrument
+                end
+            end
+        end
+    end
+end
+
 -- Reequip all the items to restore the nodes - paramount for Weapon Sheating, Ashfall, Vanity etc. --
 function this.restoreEquipped(actor)
     debugLog("Reequipping items.")

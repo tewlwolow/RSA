@@ -1,11 +1,11 @@
-local data = require("Resdayn Sonorant Apparati\\data\\data")
 local animController = require("Resdayn Sonorant Apparati\\controllers\\animationController")
 
 local RSAmenuCreated = 0
 local improvMenuCreated = 0
+local vanityFlag = 0
 local menuElementsPath = "Icons\\RSA\\ui\\menu\\"
 
-local playerMesh, equippedData, equippedInstrument
+local playerMesh, equippedInstrument
 
 local ImageButton = {}
 
@@ -13,11 +13,25 @@ local modversion = require("Resdayn Sonorant Apparati\\version")
 local version = modversion.version
 local config = require("Resdayn Sonorant Apparati.config")
 local debugLogOn = config.debugLogOn
+
+local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[Resdayn Sonorant Apparati "..version.."] Main UI Controller: "..string)
     end
 end
+
+local riffMap =
+{
+    ["regular"] =
+    {
+        playRiff1 = tes3.scanCode.numpad1,
+        playRiff2 =  tes3.scanCode.numpad2,
+        playRiff3 = tes3.scanCode.numpad3,
+    },
+}
+local riffKeys = riffMap[config.riffKeys]
+
 
 -- Image buttons from UI Expansion --
 function ImageButton.over(e)
@@ -85,23 +99,16 @@ local function createMenu(e)
         if RSAmenuCreated ~= 1 then
 
             debugLog("Creating RSA Menu.")
-            -- Get the player mesh to restore controls later --
-            playerMesh = tes3.player.object.mesh
 
-            -- Check if we have equipped an RSA instrument, return if false --
-            equippedData = tes3.player.data.RSA.equipped
-            local node = tes3.player.sceneNode:getObjectByName("Bip01 Attached Instrument")
-            if node == nil or equippedData == nil then
+            -- Check if we have equipped an RSA instrument, return if not --
+            equippedInstrument = equipInstrument.getEquippedInstrument()
+            if equippedInstrument == nil then
                 tes3.messageBox("You haven't got any instrument equipped.")
                 return
-            else
-                for _, instrument in pairs(data.instruments) do
-                    if equippedData == instrument.id then
-                        equippedInstrument = instrument
-                        break
-                    end
-                end
             end
+
+            -- Get the player mesh to restore controls later --
+            playerMesh = tes3.player.object.mesh
 
             local RSAMenu = tes3ui.createMenu{ id = RSAMenuID, fixedFrame = true }
             RSAMenu:getContentElement().childAlignX = 0.5
@@ -263,4 +270,37 @@ local function createMenu(e)
     end
 end
 
-event.register("key", createMenu, {filter = tes3.scanCode.n})
+local function improvModeUI(e)
+    if tes3.player.data.RSA.improvMode == false then return end
+    debugLog("Improv mode on.")
+    for _, v in pairs(riffKeys) do
+        if e.keyCode == v and equippedInstrument ~= nil then
+            debugLog("Riff key pressed.")
+            if v == tes3.scanCode.numpad1 then
+                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.playRiff1, tes3.animationGroup.idle9)
+                animController.attachInstrument(equippedInstrument, tes3.player)
+            elseif v == tes3.scanCode.numpad2 then
+                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.playRiff2, tes3.animationGroup.idle9)
+                animController.attachInstrument(equippedInstrument, tes3.player)
+            elseif v == tes3.scanCode.numpad3 then
+                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.playRiff3, tes3.animationGroup.idle9)
+                animController.attachInstrument(equippedInstrument, tes3.player)
+            end
+        break
+        end
+    end
+    if e.keyCode == config.vanityKey then
+        if vanityFlag == 0 then
+            tes3.setVanityMode({enabled = true})
+            vanityFlag = 1
+        else
+            tes3.setVanityMode({enabled = false})
+            vanityFlag = 0
+        end
+    end
+end
+
+event.register("keyDown", createMenu, {filter = tes3.scanCode.n})
+event.register("keyDown", improvModeUI)
+
+

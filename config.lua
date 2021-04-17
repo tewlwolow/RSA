@@ -3,4 +3,6 @@ return mwse.loadConfig("Resdayn Sonorant Apparati", {
     hitsOn = true,
     staticNamesOn = true,
     debugLogOn = false,
+    riffKeys = "regular",
+    vanityKey = tes3.scanCode.tab
 })

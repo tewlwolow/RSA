@@ -106,9 +106,9 @@ this.animations = {
     {
         equip = "RSA\\anims\\lute\\luteEquip2.nif",
         idle = "RSA\\anims\\lute\\tew_luteIdle.nif",
-        playRiff1 = "RSA\\anims\\",
-        playRiff2 = "RSA\\anims\\",
-        playRiff3 = "RSA\\anims\\",
+        playRiff1 = "RSA\\anims\\lute\\tew_luteIdle.nif",
+        playRiff2 = "RSA\\anims\\lute\\tew_luteIdle.nif",
+        playRiff3 = "RSA\\anims\\lute\\tew_luteIdle.nif",
     },
     ["zitherHorizontal"] =
     {
