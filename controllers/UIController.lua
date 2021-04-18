@@ -271,7 +271,7 @@ local function createMenu(e)
 end
 
 local function improvModeUI(e)
-    if tes3.player.data.RSA.improvMode == false then return end
+    if tes3.player.data.RSA.improvMode ~= true then return end
     debugLog("Improv mode on.")
     for _, v in pairs(riffKeys) do
         if e.keyCode == v and equippedInstrument ~= nil then

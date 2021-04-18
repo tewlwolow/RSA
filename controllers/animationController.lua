@@ -95,9 +95,9 @@ end
 
 -- The improvisation animation cycle - equip, then idle loop --
 function this.startImprovCycle(instrument, playerMesh, actor)
-    tes3.player.data.RSA.improvMode = true
     tes3.force3rdPerson()
     disableControls()
+    tes3.player.data.RSA.improvMode = true
 
     -- Register instrument attachment on idle animation --
     --[[attachCallback = function(e)
@@ -118,7 +118,7 @@ function this.startImprovCycle(instrument, playerMesh, actor)
 
     -- Wait some then play the idle animation --
     timer.start{
-        duration = 0.7,
+        duration = 3.5,
         callback=function()
             this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.idle, tes3.animationGroup.idle9)
             this.attachInstrument(instrument, actor)
