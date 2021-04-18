@@ -14,6 +14,7 @@ local function init()
     -- Get proper data structure - create paths for modes and riffs per culture --
     local data = require("Resdayn Sonorant Apparati\\data\\data")
     local i = 0
+    local riffPath = "Vo\\RSA\\"
     for _, instrument in pairs(data.instruments) do
         for _, mode in pairs(data.modes[instrument.culture]) do
             local spacelessModeName = mode.name:gsub("%s+", "")
@@ -21,9 +22,9 @@ local function init()
             i = i + 1
             instrument.modes[i].name = mode.name
             instrument.modes[i].description = mode.description
-            instrument.modes[i].riff1 = "RSA//"..instrument.culture.."//"..spacelessInstrumentType.."//modes//"..mode.name.."//rsa_"..instrument.type:lower().."_"..spacelessModeName:lower().."1.wav"
-            instrument.modes[i].riff2 = "RSA//"..instrument.culture.."//"..spacelessInstrumentType.."//modes//"..mode.name.."//rsa_"..instrument.type:lower().."_"..spacelessModeName:lower().."2.wav"
-            instrument.modes[i].riff3 = "RSA//"..instrument.culture.."//"..spacelessInstrumentType.."//modes//"..mode.name.."//rsa_"..instrument.type:lower().."_"..spacelessModeName:lower().."3.wav"
+            instrument.modes[i].riff1 = riffPath..instrument.culture.."\\"..spacelessInstrumentType.."\\modes\\"..mode.name:lower().."\\rsa_"..instrument.name:lower().."_"..spacelessModeName:lower().."-riff1.mp3"
+            instrument.modes[i].riff2 = riffPath..instrument.culture.."\\"..spacelessInstrumentType.."\\modes\\"..mode.name:lower().."\\rsa_"..instrument.name:lower().."_"..spacelessModeName:lower().."-riff2.mp3"
+            instrument.modes[i].riff3 = riffPath..instrument.culture.."\\"..spacelessInstrumentType.."\\modes\\"..mode.name:lower().."\\rsa_"..instrument.name:lower().."_"..spacelessModeName:lower().."-riff3.mp3"
         end
         i = 0
     end

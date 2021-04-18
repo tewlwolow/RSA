@@ -25,9 +25,9 @@ local riffMap =
 {
     ["regular"] =
     {
-        playRiff1 = tes3.scanCode.numpad1,
-        playRiff2 =  tes3.scanCode.numpad2,
-        playRiff3 = tes3.scanCode.numpad3,
+        riff1 = tes3.scanCode.numpad1,
+        riff2 =  tes3.scanCode.numpad2,
+        riff3 = tes3.scanCode.numpad3,
     },
 }
 local riffKeys = riffMap[config.riffKeys]
@@ -186,7 +186,7 @@ local function createMenu(e)
                             improvMenu:destroy()
                             improvMenuCreated = 0
                             --tes3.messageBox("Playing mode: "..mode.name..": "..mode.description)
-
+                            tes3.player.data.RSA.currentMode = mode.name
                             animController.startImprovCycle(equippedInstrument, playerMesh, tes3.player)
 
                         end)
@@ -271,24 +271,37 @@ local function createMenu(e)
 end
 
 local function improvModeUI(e)
-    if tes3.player.data.RSA.improvMode ~= true then return end
+    if tes3.player.data.RSA.improvMode ~= true or equippedInstrument == nil or tes3.player.data.RSA.currentMode == nil then return end
     debugLog("Improv mode on.")
-    for _, v in pairs(riffKeys) do
-        if e.keyCode == v and equippedInstrument ~= nil then
-            debugLog("Riff key pressed.")
-            if v == tes3.scanCode.numpad1 then
-                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.playRiff1, tes3.animationGroup.idle9)
-                animController.attachInstrument(equippedInstrument, tes3.player)
-            elseif v == tes3.scanCode.numpad2 then
-                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.playRiff2, tes3.animationGroup.idle9)
-                animController.attachInstrument(equippedInstrument, tes3.player)
-            elseif v == tes3.scanCode.numpad3 then
-                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.playRiff3, tes3.animationGroup.idle9)
-                animController.attachInstrument(equippedInstrument, tes3.player)
-            end
-        break
+    local soundController =  require("Resdayn Sonorant Apparati\\controllers\\soundController")
+    local riff1Path, riff2Path, riff3Path
+    for _, mode in pairs(equippedInstrument.modes) do
+        if mode.name == tes3.player.data.RSA.currentMode then
+            riff1Path = mode.riff1
+            riff2Path = mode.riff2
+            riff3Path = mode.riff3
         end
     end
+        -- TODO -> store the currently player sound object, remove in soundController.playMusic
+        -- play idle animatiom between riffs
+
+    if e.keyCode == riffKeys.riff1 then
+        debugLog("Pressed first riff key.")
+        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff1, tes3.animationGroup.idle9)
+        animController.attachInstrument(equippedInstrument, tes3.player)
+        soundController.playMusic(riff1Path, tes3.player)
+    elseif e.keyCode == riffKeys.riff2 then
+        debugLog("Pressed second riff key.")
+        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff2, tes3.animationGroup.idle9)
+        animController.attachInstrument(equippedInstrument, tes3.player)
+        soundController.playMusic(riff2Path, tes3.player)
+    elseif e.keyCode == riffKeys.riff3 then
+        debugLog("Pressed third riff key.")
+        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff3, tes3.animationGroup.idle9)
+        animController.attachInstrument(equippedInstrument, tes3.player)
+        soundController.playMusic(riff3Path, tes3.player)
+    end
+
     if e.keyCode == config.vanityKey then
         if vanityFlag == 0 then
             tes3.setVanityMode({enabled = true})

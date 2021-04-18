@@ -4,9 +4,11 @@ local modversion = require("Resdayn Sonorant Apparati\\version")
 local version = modversion.version
 local config = require("Resdayn Sonorant Apparati.config")
 local debugLogOn = config.debugLogOn
-local cancelCallback, cancelOptions, attachCallback
+local cancelCallback, cancelOptions
 
 local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
+
+local equipDuration = 2.9
 
 local function debugLog(string)
     if debugLogOn then
@@ -51,6 +53,7 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
         equipInstrument.equip(actor, instrument)
         equipInstrument.restoreEquipped(actor)
         tes3.player.data.RSA.improvMode = false
+        tes3.player.data.RSA.currentMode = nil
         tes3.setVanityMode({enabled = false})
         enableControls()
     end
@@ -118,7 +121,7 @@ function this.startImprovCycle(instrument, playerMesh, actor)
 
     -- Wait some then play the idle animation --
     timer.start{
-        duration = 3.5,
+        duration = equipDuration,
         callback=function()
             this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.idle, tes3.animationGroup.idle9)
             this.attachInstrument(instrument, actor)
