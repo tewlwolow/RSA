@@ -3,13 +3,29 @@ local modversion = require("Resdayn Sonorant Apparati.version")
 local version = modversion.version
 
 local function init()
-    mwse.log("[Resdayn Sonorant Apparati] Resdayn Sonorant Apparati version "..version.." initialised.")
+    local config = require("Resdayn Sonorant Apparati.config")
+    local debugLogOn = config.debugLogOn
+    local function debugLog(string)
+        if debugLogOn then
+        mwse.log("[Resdayn Sonorant Apparati "..version.."] Main file: "..string)
+        end
+    end
+    debugLog("Mod initialised.")
 
     -- Load player data on loaded --
     local function getData()
         tes3.player.data.RSA = tes3.player.data.RSA or {}
     end
     event.register("loaded", getData, {priority = 50})
+
+    -- Store currently played sound --
+    local function soundPlayed(e)
+        --mwse.log("(%s) Reference: %s; Sound: %s; Path: '%s'; Flags: 0x%x; Volume: %.2f; Pitch: %.2f; isVoiceover: %s", e.eventType, e.reference, e.sound, e.path, e.flags, e.volume / 250, e.pitch, e.isVoiceover)
+        if (e.path) and (string.find(e.path, "RSA")) then
+            tes3.player.data.RSA.currentSound =  e.sound
+        end
+    end
+    event.register("addTempSound", soundPlayed)
 
     -- Get proper data structure - create paths for modes and riffs per culture --
     local data = require("Resdayn Sonorant Apparati\\data\\data")

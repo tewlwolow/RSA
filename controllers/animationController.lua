@@ -8,7 +8,7 @@ local cancelCallback, cancelOptions
 
 local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
 
-local equipDuration = 2.9
+local equipDuration = 3.1
 
 local function debugLog(string)
     if debugLogOn then
@@ -53,9 +53,19 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
         equipInstrument.equip(actor, instrument)
         equipInstrument.restoreEquipped(actor)
         tes3.player.data.RSA.improvMode = false
+
+        tes3.removeSound{
+            sound = tes3.player.data.RSA.currentSound,
+            reference = actor
+        }
+        tes3.player.data.RSA.currentSound = nil
+
         tes3.player.data.RSA.currentMode = nil
         tes3.setVanityMode({enabled = false})
         enableControls()
+
+        tes3.player.position = tes3.player.data.RSA.fixPosition
+        tes3.player.orientation = tes3.player.data.RSA.fixOrientation
     end
 end
 
@@ -68,7 +78,10 @@ function this.playAnimation(actor, start, animType, animGroup)
         mesh = animType,
         startFlag = start,
     })
-
+    timer.delayOneFrame(function()
+        tes3.player.position = tes3.player.data.RSA.fixPosition
+        tes3.player.orientation = tes3.player.data.RSA.fixOrientation
+    end)
 end
 
 -- Attach instrument for idle and play animations --
@@ -91,9 +104,11 @@ function this.attachInstrument(instrument, actor)
         else
             debugLog("Attach Instrument node is nil!")
         end
-        --[[event.unregister("playGroup", attachCallback)
-        attachCallback = nil]]
         debugLog("Instrument attached.")
+        timer.delayOneFrame(function()
+            tes3.player.position = tes3.player.data.RSA.fixPosition
+            tes3.player.orientation = tes3.player.data.RSA.fixOrientation
+        end)
 end
 
 -- The improvisation animation cycle - equip, then idle loop --
@@ -101,12 +116,6 @@ function this.startImprovCycle(instrument, playerMesh, actor)
     tes3.force3rdPerson()
     disableControls()
     tes3.player.data.RSA.improvMode = true
-
-    -- Register instrument attachment on idle animation --
-    --[[attachCallback = function(e)
-    this.attachInstrument(e, instrument, actor)
-    end
-    event.register("playGroup", attachCallback)]]
 
     -- Register alt+c to break the animation cycle --
     cancelCallback = function(e)
@@ -128,7 +137,6 @@ function this.startImprovCycle(instrument, playerMesh, actor)
         end,
         type = timer.simulate
     }
-
 
 end
 

@@ -109,6 +109,9 @@ local function createMenu(e)
 
             -- Get the player mesh to restore controls later --
             playerMesh = tes3.player.object.mesh
+            -- Get the player position and orientation to fix animation offset --
+            tes3.player.data.RSA.fixPosition = tes3.player.position
+            tes3.player.data.RSA.fixOrientation = tes3.player.orientation
 
             local RSAMenu = tes3ui.createMenu{ id = RSAMenuID, fixedFrame = true }
             RSAMenu:getContentElement().childAlignX = 0.5
@@ -273,7 +276,7 @@ end
 local function improvModeUI(e)
     if tes3.player.data.RSA.improvMode ~= true or equippedInstrument == nil or tes3.player.data.RSA.currentMode == nil then return end
     debugLog("Improv mode on.")
-    local soundController =  require("Resdayn Sonorant Apparati\\controllers\\soundController")
+    local playMusic =  require("Resdayn Sonorant Apparati\\shared\\playMusic")
     local riff1Path, riff2Path, riff3Path
     for _, mode in pairs(equippedInstrument.modes) do
         if mode.name == tes3.player.data.RSA.currentMode then
@@ -282,24 +285,23 @@ local function improvModeUI(e)
             riff3Path = mode.riff3
         end
     end
-        -- TODO -> store the currently player sound object, remove in soundController.playMusic
         -- play idle animatiom between riffs
 
     if e.keyCode == riffKeys.riff1 then
+        playMusic.playMusic(riff1Path, tes3.player)
         debugLog("Pressed first riff key.")
         animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff1, tes3.animationGroup.idle9)
         animController.attachInstrument(equippedInstrument, tes3.player)
-        soundController.playMusic(riff1Path, tes3.player)
     elseif e.keyCode == riffKeys.riff2 then
+        playMusic.playMusic(riff2Path, tes3.player)
         debugLog("Pressed second riff key.")
         animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff2, tes3.animationGroup.idle9)
         animController.attachInstrument(equippedInstrument, tes3.player)
-        soundController.playMusic(riff2Path, tes3.player)
     elseif e.keyCode == riffKeys.riff3 then
+        playMusic.playMusic(riff3Path, tes3.player)
         debugLog("Pressed third riff key.")
         animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff3, tes3.animationGroup.idle9)
         animController.attachInstrument(equippedInstrument, tes3.player)
-        soundController.playMusic(riff3Path, tes3.player)
     end
 
     if e.keyCode == config.vanityKey then
@@ -313,7 +315,9 @@ local function improvModeUI(e)
     end
 end
 
+local HUD = require("Resdayn Sonorant Apparati\\shared\\HUD")
+event.register("uiActivated", HUD.createHUD, { filter = "MenuMulti" })
+
 event.register("keyDown", createMenu, {filter = tes3.scanCode.n})
 event.register("keyDown", improvModeUI)
-
 

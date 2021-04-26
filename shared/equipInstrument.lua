@@ -8,6 +8,8 @@ local version = modversion.version
 local config = require("Resdayn Sonorant Apparati.config")
 local debugLogOn = config.debugLogOn
 
+local HUD = require("Resdayn Sonorant Apparati\\shared\\HUD")
+
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[Resdayn Sonorant Apparati "..version.."] Equip Instrument: "..string)
@@ -87,6 +89,10 @@ function this.equip(ref, instrument)
         -- Store the equipped id for other modules to use --
         tes3.player.data.RSA.equipped = instrument.id
         debugLog(instrument.name.." equipped.")
+
+        local multiMenu = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
+        local mainHUDBlock = multiMenu:findChild(HUD.IDs.mainHUDBlock)
+        HUD.createInstrumentHUD(mainHUDBlock)
     end
 
 end
@@ -102,6 +108,11 @@ function this.unequip(ref)
         tes3.player.data.RSA.equipped = nil
     end
     debugLog("Instrument unequipped.")
+
+    local menuMulti = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
+    local instrumentBlock = menuMulti:findChild(HUD.IDs.instrumentBorder)
+    instrumentBlock.visible = false
+    instrumentBlock:destroy()
 end
 
 -- Main logic loop for equip event --
