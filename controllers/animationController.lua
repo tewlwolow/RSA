@@ -47,7 +47,7 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
         cancelCallback, cancelOptions = nil, nil
 
         -- Reequip the instrument --
-        tes3.player.data.RSA.equipped = nil
+        equipInstrument.unequip(actor)
         equipInstrument.equip(actor, instrument)
         equipInstrument.restoreEquipped(actor)
         tes3.player.data.RSA.improvMode = false
