@@ -46,8 +46,6 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
         event.unregister("key", cancelCallback, cancelOptions)
         cancelCallback, cancelOptions = nil, nil
 
-        -- Reequip nodes that get removed when we play our animation --
-
         -- Reequip the instrument --
         tes3.player.data.RSA.equipped = nil
         equipInstrument.equip(actor, instrument)
@@ -78,10 +76,10 @@ function this.playAnimation(actor, start, animType, animGroup)
         mesh = animType,
         startFlag = start,
     })
-    timer.delayOneFrame(function()
-        tes3.player.position = tes3.player.data.RSA.fixPosition
-        tes3.player.orientation = tes3.player.data.RSA.fixOrientation
-    end)
+
+    tes3.player.position = tes3.player.data.RSA.fixPosition
+    tes3.player.orientation = tes3.player.data.RSA.fixOrientation
+
 end
 
 -- Attach instrument for idle and play animations --
@@ -105,10 +103,10 @@ function this.attachInstrument(instrument, actor)
             debugLog("Attach Instrument node is nil!")
         end
         debugLog("Instrument attached.")
-        timer.delayOneFrame(function()
-            tes3.player.position = tes3.player.data.RSA.fixPosition
-            tes3.player.orientation = tes3.player.data.RSA.fixOrientation
-        end)
+
+        tes3.player.position = tes3.player.data.RSA.fixPosition
+        tes3.player.orientation = tes3.player.data.RSA.fixOrientation
+
 end
 
 -- The improvisation animation cycle - equip, then idle loop --
@@ -117,7 +115,7 @@ function this.startImprovCycle(instrument, playerMesh, actor)
     disableControls()
     tes3.player.data.RSA.improvMode = true
 
-    -- Register alt+c to break the animation cycle --
+    -- Register alt+x to break the animation cycle --
     cancelCallback = function(e)
     this.cancelAnimation(e, playerMesh, instrument, actor)
     end
@@ -126,6 +124,7 @@ function this.startImprovCycle(instrument, playerMesh, actor)
 
     -- Play the equip animation --
     this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle8)
+    this.attachInstrument(instrument, actor)
 
 
     -- Wait some then play the idle animation --
