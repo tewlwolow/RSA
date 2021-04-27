@@ -69,6 +69,9 @@ end
 
 -- Generic playAnimation function --
 function this.playAnimation(actor, start, animType, animGroup)
+    tes3.player.position = tes3.player.data.RSA.fixPosition
+    tes3.player.orientation = tes3.player.data.RSA.fixOrientation
+
     debugLog("Playing animation for instrument: "..tes3.player.data.RSA.equipped)
     tes3.playAnimation({
         reference = actor,
@@ -79,7 +82,6 @@ function this.playAnimation(actor, start, animType, animGroup)
 
     tes3.player.position = tes3.player.data.RSA.fixPosition
     tes3.player.orientation = tes3.player.data.RSA.fixOrientation
-
 end
 
 -- Attach instrument for idle and play animations --
