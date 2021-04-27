@@ -85,17 +85,17 @@ local function onAttack(--[[e]])
                         end
 
                         tes3.playSound{
-                            soundPath = "RSA\\hits\\"..instrument.id..".wav",
+                            soundPath = "Vo\\RSA\\hits\\"..instrument.id..".mp3",
                             pitch = malletPitch or 1.0,
                             reference = targetRef
                         }
-                        debugLog("Played hit sound: "..instrument.id..".wav")
+                        debugLog("Played hit sound: "..instrument.id..".mp3")
                         break
 
                     else
                         -- If we don't use a mallet weapon, play metallic noise --
                         tes3.playSound{
-                            soundPath = "RSA\\hits\\rsa_gong-failed.wav",
+                            soundPath = "Vo\\RSA\\hits\\rsa_gong-failed.mp3",
                             reference = targetRef
                         }
                         debugLog("Played failed hit sound.")
@@ -103,7 +103,7 @@ local function onAttack(--[[e]])
                 else
                     -- If we're barehanded, play metallic noise --
                     tes3.playSound{
-                        soundPath = "RSA\\hits\\rsa_gong-failed.wav",
+                        soundPath = "Vo\\RSA\\hits\\rsa_gong-failed_hh.mp3",
                         reference = targetRef
                     }
                     debugLog("Played failed hit sound (barehands).")
