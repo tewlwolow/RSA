@@ -278,6 +278,8 @@ local function improvModeUI(e)
     debugLog("Improv mode on.")
     local playMusic =  require("Resdayn Sonorant Apparati\\shared\\playMusic")
     local riff1Path, riff2Path, riff3Path
+
+    -- Get valid riff paths from currently selected mode --
     for _, mode in pairs(equippedInstrument.modes) do
         if mode.name == tes3.player.data.RSA.currentMode then
             riff1Path = mode.riff1
@@ -285,23 +287,54 @@ local function improvModeUI(e)
             riff3Path = mode.riff3
         end
     end
-        -- play idle animatiom between riffs
 
+    -- Keybind logic --
     if e.keyCode == riffKeys.riff1 then
+        -- Remove the idle timer from previous riffs if present --
+        if animController.riffTimer then
+            animController.riffTimer:pause()
+            animController.riffTimer:cancel()
+        end
+        -- Play current riff track --
         playMusic.playMusic(riff1Path, tes3.player)
-        debugLog("Pressed first riff key.")
-        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff1, tes3.animationGroup.idle9)
-        animController.attachInstrument(equippedInstrument, tes3.player)
+        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff1, tes3.animationGroup.idle9, equippedInstrument)
+
+        -- Start the idle timer --
+        animController.riffTimer = timer.start{
+            duration = tes3.player.data.RSA.riffLength,
+            callback=function()
+                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
+            end,
+            type = timer.simulate
+        }
     elseif e.keyCode == riffKeys.riff2 then
+        if animController.riffTimer then
+            animController.riffTimer:pause()
+            animController.riffTimer:cancel()
+        end
         playMusic.playMusic(riff2Path, tes3.player)
-        debugLog("Pressed second riff key.")
-        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff2, tes3.animationGroup.idle9)
-        animController.attachInstrument(equippedInstrument, tes3.player)
+        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff2, tes3.animationGroup.idle9, equippedInstrument)
+        animController.riffTimer = timer.start{
+            duration = tes3.player.data.RSA.riffLength,
+            callback=function()
+                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
+            end,
+            type = timer.simulate
+        }
     elseif e.keyCode == riffKeys.riff3 then
+        if animController.riffTimer then
+            animController.riffTimer:pause()
+            animController.riffTimer:cancel()
+        end
         playMusic.playMusic(riff3Path, tes3.player)
-        debugLog("Pressed third riff key.")
-        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff3, tes3.animationGroup.idle9)
-        animController.attachInstrument(equippedInstrument, tes3.player)
+        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff3, tes3.animationGroup.idle9, equippedInstrument)
+        animController.riffTimer = timer.start{
+            duration = tes3.player.data.RSA.riffLength,
+            callback=function()
+                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
+            end,
+            type = timer.simulate
+        }
     end
 
     if e.keyCode == config.vanityKey then
