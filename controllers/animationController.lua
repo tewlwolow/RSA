@@ -4,8 +4,10 @@ local modversion = require("Resdayn Sonorant Apparati\\version")
 local version = modversion.version
 local config = require("Resdayn Sonorant Apparati.config")
 local debugLogOn = config.debugLogOn
-local cancelCallback, cancelOptions, riffTimer
+local cancelCallback, cancelOptions
+this.riffTimer = nil
 
+local HUD = require("Resdayn Sonorant Apparati\\shared\\HUD")
 local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
 
 local equipDuration = 3.9
@@ -59,8 +61,11 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
     if e.isAltDown then
 
         -- Remove idle animation control timer --
-        this.riffTimer:pause()
-        this.riffTimer:cancel()
+        if this.riffTimer then
+            this.riffTimer:pause()
+            this.riffTimer:cancel()
+            this.riffTimer = nil
+        end
 
         debugLog("Cancelling animation, player mesh: "..playerMesh)
         tes3.playAnimation({
@@ -78,7 +83,19 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
         equipInstrument.unequip(actor)
         equipInstrument.equip(actor, instrument)
         equipInstrument.restoreEquipped(actor)
+
         tes3.player.data.RSA.improvMode = false
+        tes3.player.data.RSA.musicMode = false
+
+        local menuMulti = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
+        local musicModeBorder = menuMulti:findChild(HUD.IDs.musicModeBorder)
+        musicModeBorder.visible = false
+        musicModeBorder:destroy()
+        tes3.player.data.RSA.musicMode = false
+
+        local instrumentModeBorder = menuMulti:findChild(HUD.IDs.instrumentModeBorder)
+        instrumentModeBorder.visible = false
+        instrumentModeBorder:destroy()
 
         -- Remove played sound --
         tes3.removeSound{
@@ -87,7 +104,7 @@ function this.cancelAnimation(e, playerMesh, instrument, actor)
         }
         tes3.player.data.RSA.currentSound = nil
 
-        -- Reset the played node --
+        -- Reset the played mode --
         tes3.player.data.RSA.currentMode = nil
 
         -- Reenable player controls --
@@ -129,13 +146,6 @@ function this.startImprovCycle(instrument, playerMesh, actor)
     disableControls()
     tes3.player.data.RSA.improvMode = true
 
-    -- Register alt+x to break the animation cycle --
-    cancelCallback = function(e)
-    this.cancelAnimation(e, playerMesh, instrument, actor)
-    end
-    cancelOptions = { filter = tes3.scanCode.x }
-    event.register("key", cancelCallback, cancelOptions)
-
     -- Play the equip animation --
     this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle8, instrument)
 
@@ -144,6 +154,12 @@ function this.startImprovCycle(instrument, playerMesh, actor)
         duration = equipDuration,
         callback=function()
             this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.idle, tes3.animationGroup.idle9, instrument)
+            -- Register alt+x to break the animation cycle --
+            cancelCallback = function(e)
+            this.cancelAnimation(e, playerMesh, instrument, actor)
+            end
+            cancelOptions = { filter = config.cancelKey }
+            event.register("key", cancelCallback, cancelOptions)
         end,
         type = timer.simulate
     }

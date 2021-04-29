@@ -16,6 +16,7 @@ local this = {}
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -23,6 +24,7 @@ local this = {}
             {
             name = "",
             description = "",
+                icon = "",
             riff1 = "",
             riff2 = "",
             riff3 = "",
@@ -30,6 +32,7 @@ local this = {}
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -55,15 +58,18 @@ this.modes = {
     ["Dunmer"] = {
         {
             name = "Bahraan",
-            description = "Bahraan is a solemn Dunmer mode."
+            description = "Bahraan is a solemn Dunmer mode.",
+            icon = "Icons\\RSA\\ui\\hud\\modes\\Dunmer\\rsa_bahraanicon.tga"
         },
         {
             name = "Luvasi",
-            description = "Luvasi is a romantic Dunmer mode."
+            description = "Luvasi is a romantic Dunmer mode.",
+            icon = "Icons\\RSA\\ui\\hud\\modes\\Dunmer\\rsa_luvasiicon.tga"
         },
         {
             name = "Ruhn Kelak",
-            description = "Ruhn Kelak is a vigorous Dunmer mode."
+            description = "Ruhn Kelak is a vigorous Dunmer mode.",
+            icon = "Icons\\RSA\\ui\\hud\\modes\\Dunmer\\rsa_ruhnkelakicon.tga"
         },
     },
 }
@@ -210,6 +216,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -217,6 +224,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -224,6 +232,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -254,6 +263,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -261,6 +271,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -268,6 +279,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -298,6 +310,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -305,6 +318,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -312,6 +326,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -342,6 +357,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -349,6 +365,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -356,6 +373,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -386,6 +404,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -393,6 +412,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -400,6 +420,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -430,6 +451,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -437,6 +459,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -444,6 +467,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -474,6 +498,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -481,6 +506,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -488,6 +514,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -518,6 +545,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -525,6 +553,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -532,6 +561,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -562,6 +592,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -569,6 +600,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -576,6 +608,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -606,6 +639,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -613,6 +647,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -620,6 +655,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -650,6 +686,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -657,6 +694,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -664,6 +702,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -694,6 +733,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -701,6 +741,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -708,6 +749,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -738,6 +780,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -745,6 +788,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -752,6 +796,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -782,6 +827,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -789,6 +835,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -796,6 +843,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -826,6 +874,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -833,6 +882,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -840,6 +890,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -870,6 +921,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -877,6 +929,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -884,6 +937,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -914,6 +968,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -921,6 +976,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -928,6 +984,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -958,6 +1015,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -965,6 +1023,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -972,6 +1031,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1002,6 +1062,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1009,6 +1070,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1016,6 +1078,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1046,6 +1109,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1053,6 +1117,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1060,6 +1125,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1090,6 +1156,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1097,6 +1164,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1104,6 +1172,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1134,6 +1203,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1141,6 +1211,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1148,6 +1219,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1178,6 +1250,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1185,6 +1258,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1192,6 +1266,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1222,6 +1297,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1229,6 +1305,7 @@ this.instruments = {
                 {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1236,6 +1313,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1266,6 +1344,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1273,6 +1352,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1280,6 +1360,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1310,6 +1391,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1317,6 +1399,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1324,6 +1407,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1354,6 +1438,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1361,6 +1446,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1368,6 +1454,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1398,6 +1485,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1405,6 +1493,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1412,6 +1501,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1442,6 +1532,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1449,6 +1540,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1456,6 +1548,7 @@ this.instruments = {
             {
                 name = "",
                 description = "",
+                icon = "",
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
@@ -1473,19 +1566,5 @@ this.instruments = {
     },
 
 }
-
-
---[[
--- Let's check if we didn't fuck up big time.
-
-for _, instrument in pairs(this.instruments) do
-      print (instrument.name.."\n")
-      print (instrument.type.."\n")
-  for _, mode in pairs(instrument.modes) do
-    print(mode.name, mode.description, mode.riff1, mode.riff2, mode.riff3)
-  end
-end
-
-]]
 
 return this

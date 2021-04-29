@@ -38,6 +38,7 @@ local function init()
             i = i + 1
             instrument.modes[i].name = mode.name
             instrument.modes[i].description = mode.description
+            instrument.modes[i].icon = mode.icon
             instrument.modes[i].riff1 = riffPath..instrument.culture.."\\"..spacelessInstrumentType.."\\modes\\"..mode.name:lower().."\\rsa_"..instrument.name:lower().."_"..spacelessModeName:lower().."-riff1.mp3"
             instrument.modes[i].riff2 = riffPath..instrument.culture.."\\"..spacelessInstrumentType.."\\modes\\"..mode.name:lower().."\\rsa_"..instrument.name:lower().."_"..spacelessModeName:lower().."-riff2.mp3"
             instrument.modes[i].riff3 = riffPath..instrument.culture.."\\"..spacelessInstrumentType.."\\modes\\"..mode.name:lower().."\\rsa_"..instrument.name:lower().."_"..spacelessModeName:lower().."-riff3.mp3"
@@ -46,7 +47,6 @@ local function init()
     end
 
     -- Load config --
-    local config=require("Resdayn Sonorant Apparati.config")
     local tooltipsOn = config.tooltipsOn
     local hitsOn = config.hitsOn
     local staticNamesOn = config.staticNamesOn

@@ -33,6 +33,22 @@ function this.getEquippedInstrument()
     end
 end
 
+-- Get the mode data struct from data file per stored mode name --
+function this.getCurrentMode()
+    if tes3.player.data.RSA.currentMode then
+        local equippedInstrument = this.getEquippedInstrument()
+        local modeName = tes3.player.data.RSA.currentMode
+
+        if equippedInstrument and modeName then
+            for _, mode in pairs(data.modes[equippedInstrument.culture]) do
+                if modeName == mode.name then
+                    return mode
+                end
+            end
+        end
+    end
+end
+
 -- Reequip all the items to restore the nodes - paramount for Weapon Sheating, Ashfall, Vanity etc. --
 function this.restoreEquipped(actor)
     debugLog("Reequipping items.")
@@ -90,9 +106,7 @@ function this.equip(ref, instrument)
         tes3.player.data.RSA.equipped = instrument.id
         debugLog(instrument.name.." equipped.")
 
-        local multiMenu = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
-        local mainHUDBlock = multiMenu:findChild(HUD.IDs.mainHUDBlock)
-        HUD.createInstrumentHUD(mainHUDBlock)
+        HUD.createInstrumentIcon()
     end
 
 end
@@ -113,6 +127,7 @@ function this.unequip(ref)
     local instrumentBlock = menuMulti:findChild(HUD.IDs.instrumentBorder)
     instrumentBlock.visible = false
     instrumentBlock:destroy()
+
 end
 
 -- Main logic loop for equip event --

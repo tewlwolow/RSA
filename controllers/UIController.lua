@@ -1,5 +1,3 @@
-local animController = require("Resdayn Sonorant Apparati\\controllers\\animationController")
-
 local RSAmenuCreated = 0
 local improvMenuCreated = 0
 local vanityFlag = 0
@@ -15,6 +13,9 @@ local config = require("Resdayn Sonorant Apparati.config")
 local debugLogOn = config.debugLogOn
 
 local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
+local animController = require("Resdayn Sonorant Apparati\\controllers\\animationController")
+local HUD = require("Resdayn Sonorant Apparati\\shared\\HUD")
+
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[Resdayn Sonorant Apparati "..version.."] Main UI Controller: "..string)
@@ -31,7 +32,6 @@ local riffMap =
     },
 }
 local riffKeys = riffMap[config.riffKeys]
-
 
 -- Image buttons from UI Expansion --
 function ImageButton.over(e)
@@ -69,7 +69,6 @@ function ImageButton.release(e)
 	e.widget:triggerEvent(e)
 end
 
-
 function ImageButton.create(parent, imagePath, w, h)
 	local background = parent:createRect{}
 	background.width = w
@@ -91,27 +90,73 @@ function ImageButton.create(parent, imagePath, w, h)
 	return background
 end
 
+local function getPlayerData()
+    -- Check if we have equipped an RSA instrument, return if not --
+    equippedInstrument = equipInstrument.getEquippedInstrument()
+    if equippedInstrument == nil then
+        tes3.messageBox("You haven't got any instrument equipped.")
+        return
+    end
+
+    -- Get the player mesh to restore controls later --
+    playerMesh = tes3.player.object.mesh
+
+    -- Get the player position and orientation to fix animation offset --
+    tes3.player.data.RSA.fixPosition = tes3.player.position
+    tes3.player.data.RSA.fixOrientation = tes3.player.orientation
+
+    -- Get the mode index for mode switching --
+    if not tes3.player.data.RSA.modeIndex then tes3.player.data.RSA.modeIndex = 1 end
+end
+
+local function startImprov()
+    getPlayerData()
+    animController.startImprovCycle(equippedInstrument, playerMesh, tes3.player)
+    HUD.createMusicModeIcon()
+    local currentMode = equippedInstrument.modes[tes3.player.data.RSA.modeIndex]
+    HUD.createModeIcon(currentMode)
+    tes3.player.data.RSA.currentMode = currentMode.name
+    tes3.player.data.RSA.musicMode = true
+end
+
+local function toggleMode()
+    local modes = equippedInstrument.modes
+    local menuMulti = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
+    local instrumentModeBorder = menuMulti:findChild(HUD.IDs.instrumentModeBorder)
+    instrumentModeBorder.visible = false
+    instrumentModeBorder:destroy()
+    if tes3.player.data.RSA.modeIndex == #modes then
+        tes3.player.data.RSA.modeIndex = 1
+        local currentMode = equippedInstrument.modes[tes3.player.data.RSA.modeIndex]
+        tes3.player.data.RSA.currentMode = currentMode.name
+        HUD.createModeIcon(currentMode)
+    else
+        tes3.player.data.RSA.modeIndex = tes3.player.data.RSA.modeIndex + 1
+        local currentMode = equippedInstrument.modes[tes3.player.data.RSA.modeIndex]
+        tes3.player.data.RSA.currentMode = currentMode.name
+        HUD.createModeIcon(currentMode)
+    end
+end
+
+-- Music mode check and register --
+local function keyCheck()
+    if tes3.worldController.inputController:isKeyDown(config.musicModeKey) then
+        if tes3.player.data.RSA.musicMode == false or tes3.player.data.RSA.musicMode == nil then
+            startImprov()
+        end
+    end
+end
+
 -- Main RSA menu --
 local RSAMenuID = tes3ui.registerID("RSA:Menu")
 local function createMenu(e)
     if e.isAltDown then
         -- Check the flag, otherwise it somehow triggers twice --
         if RSAmenuCreated ~= 1 then
+            getPlayerData()
+            if equippedInstrument == nil then return end
 
             debugLog("Creating RSA Menu.")
-
-            -- Check if we have equipped an RSA instrument, return if not --
-            equippedInstrument = equipInstrument.getEquippedInstrument()
-            if equippedInstrument == nil then
-                tes3.messageBox("You haven't got any instrument equipped.")
-                return
-            end
-
-            -- Get the player mesh to restore controls later --
-            playerMesh = tes3.player.object.mesh
-            -- Get the player position and orientation to fix animation offset --
-            tes3.player.data.RSA.fixPosition = tes3.player.position
-            tes3.player.data.RSA.fixOrientation = tes3.player.orientation
 
             local RSAMenu = tes3ui.createMenu{ id = RSAMenuID, fixedFrame = true }
             RSAMenu:getContentElement().childAlignX = 0.5
@@ -188,10 +233,7 @@ local function createMenu(e)
                             tes3ui.leaveMenuMode()
                             improvMenu:destroy()
                             improvMenuCreated = 0
-                            --tes3.messageBox("Playing mode: "..mode.name..": "..mode.description)
-                            tes3.player.data.RSA.currentMode = mode.name
-                            animController.startImprovCycle(equippedInstrument, playerMesh, tes3.player)
-
+                            startImprov()
                         end)
                     end
                 end
@@ -274,11 +316,28 @@ local function createMenu(e)
 end
 
 local function improvModeUI(e)
+
+    if tes3.player.data.RSA.musicMode == true then
+        -- Toggle between instrument modes in music mode --
+        if e.keyCode == config.modeToggleKey then
+            toggleMode()
+        end
+    end
+
+    if e.keyCode == config.musicModeKey then
+        if tes3.player.data.RSA.musicMode == false or not tes3.player.data.RSA.musicMode then
+            timer.start{
+                duration = 2,
+                type = timer.simulate,
+                callback = keyCheck
+            }
+        end
+    end
+
     if tes3.player.data.RSA.improvMode ~= true or equippedInstrument == nil or tes3.player.data.RSA.currentMode == nil then return end
-    debugLog("Improv mode on.")
+
     local playMusic =  require("Resdayn Sonorant Apparati\\shared\\playMusic")
     local riff1Path, riff2Path, riff3Path
-
     -- Get valid riff paths from currently selected mode --
     for _, mode in pairs(equippedInstrument.modes) do
         if mode.name == tes3.player.data.RSA.currentMode then
@@ -288,7 +347,7 @@ local function improvModeUI(e)
         end
     end
 
-    -- Keybind logic --
+    -- Keybind riff logic --
     if e.keyCode == riffKeys.riff1 then
         -- Remove the idle timer from previous riffs if present --
         if animController.riffTimer then
@@ -337,6 +396,7 @@ local function improvModeUI(e)
         }
     end
 
+    -- Vanity mode controller --
     if e.keyCode == config.vanityKey then
         if vanityFlag == 0 then
             tes3.setVanityMode({enabled = true})
@@ -346,11 +406,10 @@ local function improvModeUI(e)
             vanityFlag = 0
         end
     end
+
 end
 
-local HUD = require("Resdayn Sonorant Apparati\\shared\\HUD")
 event.register("uiActivated", HUD.createHUD, { filter = "MenuMulti" })
 
 event.register("keyDown", createMenu, {filter = tes3.scanCode.n})
 event.register("keyDown", improvModeUI)
-
