@@ -15,7 +15,7 @@ function this.getTrackLength(path)
 	local milisec = 0.001
 
 	-- Return length in seconds by dividing size by bitrate and converting to seconds from miliseconds
-	return (size / (bitRate / (8 * 1000))) * milisec
+	return (size / (bitRate / (8))) * milisec
 
 end
 
