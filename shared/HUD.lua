@@ -68,7 +68,7 @@ function this.createInstrumentHUD(parentBlock)
 		instrumentBorder.paddingAllSides = 2
 
 
-        local instrumentBackground = instrumentBorder:createRect({color = {0.0, 0.05, 0.1} })
+        local instrumentBackground = instrumentBorder:createRect({color = {0.0, 0.0, 0.0} })
         instrumentBackground.height = 32
         instrumentBackground.width = 32
         instrumentBackground.borderAllSides = 0
