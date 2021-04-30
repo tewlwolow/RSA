@@ -27,7 +27,7 @@ local function init()
     end
     event.register("addTempSound", soundPlayed)
 
-    -- Get proper data structure - create paths for modes and riffs per culture --
+    -- Get proper data structure - create paths for modes, riffs and icons per culture --
     local data = require("Resdayn Sonorant Apparati\\data\\data")
     local i = 0
     local riffPath = "Vo\\RSA\\"

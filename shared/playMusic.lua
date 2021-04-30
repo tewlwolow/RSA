@@ -12,6 +12,7 @@ local function debugLog(string)
     end
 end
 
+-- Remove currently played music - mainly for switching from composition to improvisation mode --
 function this.removeMusic(actor)
     tes3.removeSound{
         sound = tes3.player.data.RSA.currentSound,
@@ -19,38 +20,26 @@ function this.removeMusic(actor)
     }
 end
 
+-- This function controls the currently played track --
 function this.playMusic(path, actor)
+    -- Remove the previous stored track --
     tes3.removeSound{
         sound = tes3.player.data.RSA.currentSound,
         reference = actor
     }
 
-    tes3.playSound{
-        soundPath = path,
-        reference = actor
-    }
-    debugLog("Playing music: "..path)
-    local length = trackLength.getTrackLength(path)
-    debugLog("Current music track length: "..length)
-    tes3.player.data.RSA.riffLength = length
-end
-
-function this.playComposition(path, actor)
-    tes3.removeSound{
-        sound = tes3.player.data.RSA.currentSound,
-        reference = actor
-    }
-
+    -- Play the current track --
     tes3.playSound{
         soundPath = path,
         reference = actor
     }
 
     debugLog("Playing music: "..path)
+
+    -- Store the current track length for animation control --
     local length = trackLength.getTrackLength(path)
     debugLog("Current music track length: "..length)
     tes3.player.data.RSA.riffLength = length
 end
-
 
 return this

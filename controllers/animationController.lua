@@ -20,6 +20,8 @@ local function debugLog(string)
        mwse.log("[Resdayn Sonorant Apparati "..version.."] Animation Controller: "..string)
     end
 end
+
+-- This function controlls getting rid of natural timers when switching between improvisation/composition modes etc. --
 function this.ridTimers()
     -- Remove the idle timer from previous riffs if present --
     if this.idleTimer then
@@ -36,6 +38,7 @@ function this.ridTimers()
     end
 end
 
+-- Disable player controls --
 local function setControlsDisabled(state)
     tes3.mobilePlayer.controlsDisabled = state
     tes3.mobilePlayer.jumpingDisabled = state
@@ -74,9 +77,13 @@ function this.attachInstrument(actor, instrument)
     debugLog("Instrument attached.")
 end
 
--- Cancel animation by forcing the idle animation on actor --
+-- This function controls getting out of music mode by cancelling animations --
 function this.cancelAnimation(playerMesh, instrument, actor)
+    debugLog("Cancelling animation, player mesh: "..playerMesh)
+
+    -- Set music mode flag to false --
     tes3.player.data.RSA.musicMode = false
+
     -- Remove idle animation control timer --
     if this.riffTimer then
         this.riffTimer:pause()
@@ -84,7 +91,7 @@ function this.cancelAnimation(playerMesh, instrument, actor)
         this.riffTimer = nil
     end
 
-    debugLog("Cancelling animation, player mesh: "..playerMesh)
+    -- Remove the animation by restoring the stored player mesh --
     tes3.playAnimation({
         reference = actor,
         mesh = playerMesh,
@@ -97,6 +104,7 @@ function this.cancelAnimation(playerMesh, instrument, actor)
     equipInstrument.equip(actor, instrument)
     equipInstrument.restoreEquipped(actor)
 
+    -- Get rid of the HUD if present --
     local menuMulti = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
     local musicModeBorder = menuMulti:findChild(HUD.IDs.musicModeBorder)
     if musicModeBorder then
@@ -117,21 +125,22 @@ function this.cancelAnimation(playerMesh, instrument, actor)
     -- Reset the played mode --
     tes3.player.data.RSA.currentMode = nil
 
+    -- Set the composition flag to false, needed for proper keybind logic --
     tes3.player.data.RSA.compositionPlaying = false
 
     -- Reenable player controls --
     tes3.setVanityMode({enabled = false})
     enableControls()
 
-    -- Fix position
+    -- Fix position --
     tes3.player.position = tes3.player.data.RSA.fixPosition
     tes3.player.orientation = tes3.player.data.RSA.fixOrientation
 
 end
 
+        -- Unregister event outside played RSA animation --
 function this.onCancelKey(e, playerMesh, instrument, actor)
     if e.isAltDown then
-        -- Unregister event outside played RSA animation --
         this.ridTimers()
         event.unregister("key", cancelCallback, cancelOptions)
         cancelCallback, cancelOptions = nil, nil
@@ -145,7 +154,9 @@ function this.playAnimation(actor, start, animType, animGroup, instrument)
     tes3.player.position = tes3.player.data.RSA.fixPosition
     tes3.player.orientation = tes3.player.data.RSA.fixOrientation
 
+    -- Enter the music mode --
     tes3.player.data.RSA.musicMode = true
+
     -- Play animation --
     debugLog("Playing animation for instrument: "..tes3.player.data.RSA.equipped)
     tes3.playAnimation({
@@ -165,8 +176,13 @@ end
 
 -- The improvisation animation cycle - equip, then idle loop --
 function this.startImprovCycle(instrument, playerMesh, actor)
+    -- Remove composition flag --
     tes3.player.data.RSA.compositionPlaying = false
+
+    -- Remove timers --
     this.ridTimers()
+
+    -- Go into third person and disable controls --
     tes3.force3rdPerson()
     disableControls()
 
@@ -191,8 +207,11 @@ function this.startImprovCycle(instrument, playerMesh, actor)
 
 end
 
+-- This controls the full composition animation cycle when selected from the main RSA menu --
 function this.startCompositionCycle(instrument, playerMesh, actor, path)
+    -- Enter the composition mode --
     tes3.player.data.RSA.compositionPlaying = true
+
     this.ridTimers()
     tes3.force3rdPerson()
     disableControls()
@@ -212,7 +231,11 @@ function this.startCompositionCycle(instrument, playerMesh, actor, path)
         duration = equipDuration,
         callback=function()
             this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.composition, tes3.animationGroup.idle9, instrument)
-            playMusic.playComposition(path, actor)
+
+            -- Play the composition track --
+            playMusic.playMusic(path, actor)
+
+            -- Create a timer (shared by riff timers for simplicity) to get back to idle after composition --
             this.riffTimer = timer.start{
                 duration = tes3.player.data.RSA.riffLength,
                 callback=function()
@@ -226,13 +249,18 @@ function this.startCompositionCycle(instrument, playerMesh, actor, path)
 
 end
 
-
+-- This controls the full composition animation cycle when selected from the composition menu inside improvisation mode --
 function this.startCompositionCycleShort(instrument, actor, path)
     tes3.player.data.RSA.compositionPlaying = true
     this.ridTimers()
-    this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.composition, tes3.animationGroup.idle9, instrument)
-    playMusic.playComposition(path, actor)
 
+    -- No need to play equip animation here, just go straight to composition animation --
+    this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.composition, tes3.animationGroup.idle9, instrument)
+
+    -- Play the composition track --
+    playMusic.playMusic(path, actor)
+
+     -- Create a timer (shared by riff timers for simplicity) to get back to idle after composition --
     this.riffTimer = timer.start{
         duration = tes3.player.data.RSA.riffLength,
         callback=function()

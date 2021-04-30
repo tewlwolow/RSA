@@ -117,28 +117,40 @@ local function getPlayerData()
 
 end
 
+-- This happens when player selects to enter music mode --
 local function startImprov()
     -- Get the mode index for mode switching --
     if not tes3.player.data.RSA.modeIndex or tes3.player.data.RSA.modeIndex == 0 or tes3.player.data.RSA.modeIndex == nil then tes3.player.data.RSA.modeIndex = 1 end
-
+    -- Create music mode icon --
     HUD.createMusicModeIcon()
+
+    -- Get the currently selected instrument mode from saved game or start anew --
     local currentMode = equippedInstrument.modes[tes3.player.data.RSA.modeIndex]
+    -- Create instrument mode icon --
     HUD.createModeIcon(currentMode)
     tes3.player.data.RSA.currentMode = currentMode.name
+    -- Start the improvisation animation cycle --
     animController.startImprovCycle(equippedInstrument, playerMesh, tes3.player)
 end
 
+-- This happens when the player selects a composition option from the main RSA menu --
 local function startCompositionUI(composition)
+    -- Get current compositions --
+    -- TODO: limit those to known compositions stored in a saved game --
     local path
     for _, comp in pairs(equippedInstrument.compositions) do
         if comp.name == composition then
             path = comp.path
         end
     end
+    -- Start the composition animation cycle --
     animController.startCompositionCycle(equippedInstrument, playerMesh, tes3.player, path)
 end
 
+-- This happens when the player chooses to invoke the composition menu when already in improvisation mode --
 local function startCompositionShort(composition)
+    -- Get the current mode for the icon --
+    -- It's crucial we get this data now, should the player cancel the composition and choose to play modes instead --
     tes3.player.data.RSA.currentMode = tes3.player.data.RSA.currentMode or equippedInstrument.modes[1]
     local path
     for _, comp in pairs(equippedInstrument.compositions) do
@@ -149,8 +161,12 @@ local function startCompositionShort(composition)
     animController.startCompositionCycleShort(equippedInstrument, tes3.player, path)
 end
 
+-- This function controls switching between instruments modes --
 local function toggleMode()
+    -- Get the current modes from the equipped instrument data --
     local modes = equippedInstrument.modes
+
+    -- Create HUD --
     local menuMulti = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
     local instrumentModeBorder = menuMulti:findChild(HUD.IDs.instrumentModeBorder)
     instrumentModeBorder.visible = false
@@ -178,10 +194,14 @@ local function keyCheck()
     end
 end
 
+-- This function creates the composition menu --
+-- TODO: detach the improvisation menu from main menu creation function --
 local function createCompositionMenu()
+    -- Get the name of the currently equipped instrument, return if the player doesn't know any compositions or we didn't create those yet --
     local equippedName = equippedInstrument.name
     if equippedInstrument.compositions[1].name == nil then tes3.messageBox("I don't know any compositions for the "..equippedName.name:lower()..".") return end
 
+    -- Create the composition menu --
     local compMenuID = "RSA:CompMenu"
     local compMenu = tes3ui.createMenu{ id = compMenuID, fixedFrame = true }
     compMenu:getContentElement().childAlignX = 0.5
@@ -247,7 +267,7 @@ local function createCompositionMenu()
 end
 
 
--- Main RSA menu --
+-- Create the main RSA menu --
 local RSAMenuID = tes3ui.registerID("RSA:Menu")
 local function createMenu(e)
     if e.isAltDown then
@@ -471,15 +491,17 @@ local function createMenu(e)
     end
 end
 
+-- This is the main function controlling key hits --
 local function keyController(e)
 
+    -- Toggle between instrument modes in music mode --
     if tes3.player.data.RSA.musicMode == true then
-        -- Toggle between instrument modes in music mode --
         if e.keyCode == config.modeToggleKey then
             toggleMode()
         end
     end
 
+    -- Controls whether we should enter improvisation mode if not in music mode at all or create composition menu inside music mode --
     if e.keyCode == config.musicModeKey then
         if tes3.player.data.RSA.musicMode == false or not tes3.player.data.RSA.musicMode then
             timer.start{
@@ -492,6 +514,7 @@ local function keyController(e)
         end
     end
 
+    -- The following function won't trigger unless we are in the music mode --
     if tes3.player.data.RSA.musicMode ~= true then return end
 
     -- Vanity mode controller --
@@ -505,12 +528,14 @@ local function keyController(e)
         end
     end
 
+    -- Cancel playing at any time --
     if e.keyCode == config.cancelKey then
         tes3.player.data.RSA.compositionPlaying = false
         playMusic.removeMusic(tes3.player)
         animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
     end
 
+    -- THe followign control playing riffs --
     if tes3.player.data.RSA.compositionPlaying ~= true then
         local riff1Path, riff2Path, riff3Path
         -- Get valid riff paths from currently selected mode --
@@ -564,6 +589,8 @@ local function keyController(e)
 
 end
 
+-- Cancel the animation if the player is attacked in the music mode --
+-- It only triggers after the equip animation --
 local function onAttacked(e)
     if e.targetReference == tes3.player and tes3.player.data.RSA.musicMode == true then
         animController.cancelAnimation(playerMesh, equippedInstrument, tes3.player)
