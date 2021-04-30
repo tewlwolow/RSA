@@ -12,6 +12,13 @@ local function debugLog(string)
     end
 end
 
+function this.removeMusic(actor)
+    tes3.removeSound{
+        sound = tes3.player.data.RSA.currentSound,
+        reference = actor
+    }
+end
+
 function this.playMusic(path, actor)
     tes3.removeSound{
         sound = tes3.player.data.RSA.currentSound,
@@ -22,6 +29,23 @@ function this.playMusic(path, actor)
         soundPath = path,
         reference = actor
     }
+    debugLog("Playing music: "..path)
+    local length = trackLength.getTrackLength(path)
+    debugLog("Current music track length: "..length)
+    tes3.player.data.RSA.riffLength = length
+end
+
+function this.playComposition(path, actor)
+    tes3.removeSound{
+        sound = tes3.player.data.RSA.currentSound,
+        reference = actor
+    }
+
+    tes3.playSound{
+        soundPath = path,
+        reference = actor
+    }
+
     debugLog("Playing music: "..path)
     local length = trackLength.getTrackLength(path)
     debugLog("Current music track length: "..length)

@@ -6,15 +6,33 @@ local config = require("Resdayn Sonorant Apparati.config")
 local debugLogOn = config.debugLogOn
 local cancelCallback, cancelOptions
 this.riffTimer = nil
+this.idleTimer = nil
+this.compositionTimer = nil
 
 local HUD = require("Resdayn Sonorant Apparati\\shared\\HUD")
 local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
+local playMusic =  require("Resdayn Sonorant Apparati\\shared\\playMusic")
 
 local equipDuration = 3.9
 
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[Resdayn Sonorant Apparati "..version.."] Animation Controller: "..string)
+    end
+end
+function this.ridTimers()
+    -- Remove the idle timer from previous riffs if present --
+    if this.idleTimer then
+        this.idleTimer:pause()
+        this.idleTimer:cancel()
+    end
+    if this.riffTimer then
+        this.riffTimer:pause()
+        this.riffTimer:cancel()
+    end
+    if this.compositionTimer then
+        this.compositionTimer:pause()
+        this.compositionTimer:cancel()
     end
 end
 
@@ -93,14 +111,13 @@ function this.cancelAnimation(playerMesh, instrument, actor)
     end
 
     -- Remove played sound --
-    tes3.removeSound{
-        sound = tes3.player.data.RSA.currentSound,
-        reference = actor
-    }
+    playMusic.removeMusic(actor)
     tes3.player.data.RSA.currentSound = nil
 
     -- Reset the played mode --
     tes3.player.data.RSA.currentMode = nil
+
+    tes3.player.data.RSA.compositionPlaying = false
 
     -- Reenable player controls --
     tes3.setVanityMode({enabled = false})
@@ -115,6 +132,7 @@ end
 function this.onCancelKey(e, playerMesh, instrument, actor)
     if e.isAltDown then
         -- Unregister event outside played RSA animation --
+        this.ridTimers()
         event.unregister("key", cancelCallback, cancelOptions)
         cancelCallback, cancelOptions = nil, nil
         this.cancelAnimation( playerMesh, instrument, actor)
@@ -127,6 +145,7 @@ function this.playAnimation(actor, start, animType, animGroup, instrument)
     tes3.player.position = tes3.player.data.RSA.fixPosition
     tes3.player.orientation = tes3.player.data.RSA.fixOrientation
 
+    tes3.player.data.RSA.musicMode = true
     -- Play animation --
     debugLog("Playing animation for instrument: "..tes3.player.data.RSA.equipped)
     tes3.playAnimation({
@@ -145,13 +164,16 @@ function this.playAnimation(actor, start, animType, animGroup, instrument)
 end
 
 -- The improvisation animation cycle - equip, then idle loop --
-function this.startMusicCycle(instrument, playerMesh, actor)
+function this.startImprovCycle(instrument, playerMesh, actor)
+    tes3.player.data.RSA.compositionPlaying = false
+    this.ridTimers()
     tes3.force3rdPerson()
     disableControls()
 
     -- Play the equip animation --
     this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle8, instrument)
 
+    -- Register alt+x to break the animation cycle --
     cancelCallback = function(e)
         this.onCancelKey(e, playerMesh, instrument, actor)
         end
@@ -159,12 +181,62 @@ function this.startMusicCycle(instrument, playerMesh, actor)
     event.register("key", cancelCallback, cancelOptions)
 
     -- Wait some then play the idle animation --
-    timer.start{
+    this.idleTimer = timer.start{
         duration = equipDuration,
         callback=function()
             this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.idle, tes3.animationGroup.idle9, instrument)
-            -- Register alt+x to break the animation cycle --
-            tes3.player.data.RSA.musicMode = true
+        end,
+        type = timer.simulate
+    }
+
+end
+
+function this.startCompositionCycle(instrument, playerMesh, actor, path)
+    tes3.player.data.RSA.compositionPlaying = true
+    this.ridTimers()
+    tes3.force3rdPerson()
+    disableControls()
+
+    -- Play the equip animation --
+    this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle8, instrument)
+
+    -- Register alt+x to break the animation cycle --
+    cancelCallback = function(e)
+        this.onCancelKey(e, playerMesh, instrument, actor)
+        end
+        cancelOptions = { filter = config.cancelKey }
+    event.register("key", cancelCallback, cancelOptions)
+
+    -- Wait some then play the composition animation --
+    this.idleTimer = timer.start{
+        duration = equipDuration,
+        callback=function()
+            this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.composition, tes3.animationGroup.idle9, instrument)
+            playMusic.playComposition(path, actor)
+            this.riffTimer = timer.start{
+                duration = tes3.player.data.RSA.riffLength,
+                callback=function()
+                    this.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  instrument.animation.idle, tes3.animationGroup.idle9, instrument)
+                end,
+                type = timer.simulate
+            }
+        end,
+        type = timer.simulate
+    }
+
+end
+
+
+function this.startCompositionCycleShort(instrument, actor, path)
+    tes3.player.data.RSA.compositionPlaying = true
+    this.ridTimers()
+    this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.composition, tes3.animationGroup.idle9, instrument)
+    playMusic.playComposition(path, actor)
+
+    this.riffTimer = timer.start{
+        duration = tes3.player.data.RSA.riffLength,
+        callback=function()
+            this.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  instrument.animation.idle, tes3.animationGroup.idle9, instrument)
         end,
         type = timer.simulate
     }

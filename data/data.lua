@@ -43,7 +43,9 @@ local this = {}
         compositions = {
             {
                 name = nil,
-                path = nil
+                description = "",
+                path = nil,
+                animation = nil
             }
         },
         -- this includes accesories, other objects, consumables etc.
@@ -115,6 +117,7 @@ this.animations = {
         riff1 = "RSA\\anims\\lute\\luteRiff1.nif",
         riff2 = "RSA\\anims\\lute\\luteRiff1.nif",
         riff3 = "RSA\\anims\\lute\\luteRiff1.nif",
+        composition = "RSA\\anims\\lute\\luteRiff1.nif",
     },
     ["zitherHorizontal"] =
     {
@@ -242,7 +245,8 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
-                path = nil
+                description = "",
+                path = nil,
             }
         },
         requirements = nil,
@@ -289,7 +293,8 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
-                path = nil
+                description = "",
+                path = nil,
             }
         },
         requirements = nil,
@@ -336,7 +341,8 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
-                path = nil
+                description = "",
+                path = nil,
             }
         },
         requirements = nil,
@@ -383,6 +389,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -430,6 +437,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -477,6 +485,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -524,6 +533,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -571,6 +581,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -618,6 +629,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -665,6 +677,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -712,6 +725,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -759,6 +773,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -806,6 +821,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -853,6 +869,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -900,6 +917,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -947,6 +965,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -994,6 +1013,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1041,6 +1061,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1088,6 +1109,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1135,6 +1157,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1182,6 +1205,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1229,6 +1253,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1276,6 +1301,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1323,6 +1349,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1370,6 +1397,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1417,6 +1445,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1464,6 +1493,7 @@ this.instruments = {
         compositions = {
             {
                 name = nil,
+                description = "",
                 path = nil,
             },
         },
@@ -1510,8 +1540,9 @@ this.instruments = {
         },
         compositions = {
             {
-                name = nil,
-                path = "RSA\\Dunmer\\zuileyr\\compositions\\rsa_zuileyr_velothgrace.wav",
+                name = "Lleri Mok",
+                path = "Vo\\RSA\\Dunmer\\zuileyr\\compositions\\rsa_zuileyr_lleri-mok.mp3",
+                description = "This traditional composition in Bahraan mode can be tracked back centuries. The song harks back to the hardship the Velothi people had to suffer on their migration path to Resdayn."
             },
         },
         requirements = nil,
@@ -1557,8 +1588,9 @@ this.instruments = {
         },
         compositions = {
             {
-                name = nil,
-                path = "RSA\\Dunmer\\zuileyr\\compositions\\rsa_zuileyr_velothgrace.wav",
+                name = "Lleri Mok",
+                path = "Vo\\RSA\\Dunmer\\zuileyr\\compositions\\rsa_zuileyr_lleri-mok.mp3",
+                description = "This traditional composition in Bahraan mode can be tracked back centuries. The song harks back to the hardship the Velothi people had to suffer on their migration path to Resdayn."
             },
         },
         requirements = nil,

@@ -15,6 +15,7 @@ local debugLogOn = config.debugLogOn
 local equipInstrument = require("Resdayn Sonorant Apparati\\shared\\equipInstrument")
 local animController = require("Resdayn Sonorant Apparati\\controllers\\animationController")
 local HUD = require("Resdayn Sonorant Apparati\\shared\\HUD")
+local playMusic =  require("Resdayn Sonorant Apparati\\shared\\playMusic")
 
 local function debugLog(string)
     if debugLogOn then
@@ -22,6 +23,7 @@ local function debugLog(string)
     end
 end
 
+-- Keybinds for playing riffs --
 local riffMap =
 {
     ["regular"] =
@@ -29,6 +31,12 @@ local riffMap =
         riff1 = tes3.scanCode.numpad1,
         riff2 =  tes3.scanCode.numpad2,
         riff3 = tes3.scanCode.numpad3,
+    },
+    ["alternative"] =
+    {
+        riff1 = tes3.scanCode.q,
+        riff2 =  tes3.scanCode.w,
+        riff3 = tes3.scanCode.e,
     },
 }
 local riffKeys = riffMap[config.riffKeys]
@@ -69,6 +77,7 @@ function ImageButton.release(e)
 	e.widget:triggerEvent(e)
 end
 
+-- A function to create a clickable image button --
 function ImageButton.create(parent, imagePath, w, h)
 	local background = parent:createRect{}
 	background.width = w
@@ -90,6 +99,7 @@ function ImageButton.create(parent, imagePath, w, h)
 	return background
 end
 
+-- We need this on several occasions to get some critical data to pass on --
 local function getPlayerData()
     -- Check if we have equipped an RSA instrument, return if not --
     equippedInstrument = equipInstrument.getEquippedInstrument()
@@ -105,17 +115,38 @@ local function getPlayerData()
     tes3.player.data.RSA.fixPosition = tes3.player.position
     tes3.player.data.RSA.fixOrientation = tes3.player.orientation
 
-    -- Get the mode index for mode switching --
-    if not tes3.player.data.RSA.modeIndex or tes3.player.data.RSA.modeIndex == 0 or tes3.player.data.RSA.modeIndex == nil then tes3.player.data.RSA.modeIndex = 1 end
 end
 
-local function startMusic()
-    getPlayerData()
+local function startImprov()
+    -- Get the mode index for mode switching --
+    if not tes3.player.data.RSA.modeIndex or tes3.player.data.RSA.modeIndex == 0 or tes3.player.data.RSA.modeIndex == nil then tes3.player.data.RSA.modeIndex = 1 end
+
     HUD.createMusicModeIcon()
     local currentMode = equippedInstrument.modes[tes3.player.data.RSA.modeIndex]
     HUD.createModeIcon(currentMode)
     tes3.player.data.RSA.currentMode = currentMode.name
-    animController.startMusicCycle(equippedInstrument, playerMesh, tes3.player)
+    animController.startImprovCycle(equippedInstrument, playerMesh, tes3.player)
+end
+
+local function startCompositionUI(composition)
+    local path
+    for _, comp in pairs(equippedInstrument.compositions) do
+        if comp.name == composition then
+            path = comp.path
+        end
+    end
+    animController.startCompositionCycle(equippedInstrument, playerMesh, tes3.player, path)
+end
+
+local function startCompositionShort(composition)
+    tes3.player.data.RSA.currentMode = tes3.player.data.RSA.currentMode or equippedInstrument.modes[1]
+    local path
+    for _, comp in pairs(equippedInstrument.compositions) do
+        if comp.name == composition then
+            path = comp.path
+        end
+    end
+    animController.startCompositionCycleShort(equippedInstrument, tes3.player, path)
 end
 
 local function toggleMode()
@@ -141,10 +172,80 @@ end
 local function keyCheck()
     if tes3.worldController.inputController:isKeyDown(config.musicModeKey) then
         if tes3.player.data.RSA.musicMode == false or tes3.player.data.RSA.musicMode == nil then
-            startMusic()
+            getPlayerData()
+            startImprov()
         end
     end
 end
+
+local function createCompositionMenu()
+    local equippedName = equippedInstrument.name
+    if equippedInstrument.compositions[1].name == nil then tes3.messageBox("I don't know any compositions for the "..equippedName.name:lower()..".") return end
+
+    local compMenuID = "RSA:CompMenu"
+    local compMenu = tes3ui.createMenu{ id = compMenuID, fixedFrame = true }
+    compMenu:getContentElement().childAlignX = 0.5
+    tes3ui.enterMenuMode(compMenuID)
+
+    local title = compMenu:createLabel{id = tes3ui.registerID("RSA:CompMenu_Title"), text = equippedName}
+
+    local descrBlock = compMenu:createBlock({id=tes3ui.registerID("RSA:CompMenu_DescriptionBlock")})
+    local description = descrBlock:createLabel({id=tes3ui.registerID("RSA:CompMenu_Description"), text = equippedInstrument.description})
+    descrBlock.autoHeight = true
+    descrBlock.width = 360
+    descrBlock.flowDirection = "left_to_right"
+    descrBlock.wrapText = true
+
+    local compBlock = compMenu:createBlock({id=tes3ui.registerID("RSA:CompMenu_CompsBlock")})
+    compBlock.borderTop = 6
+    compBlock.autoHeight = true
+    compBlock.autoWidth = true
+    compBlock.flowDirection = "top_to_bottom"
+
+    local compButtonId = tes3ui.registerID("RSA:CompMenu_CompButton")
+
+    for _, composition in pairs(equippedInstrument.compositions) do
+        local compButton = compBlock:createButton{
+            id = compButtonId,
+            text = composition.name,
+        }
+
+        compButton:register("help", function()
+            local labelText = composition.description
+            HUD.createTooltip({text = labelText})
+        end)
+
+        compButton:register("mouseClick", function()
+            tes3ui.leaveMenuMode()
+            compMenu:destroy()
+            if tes3.player.data.RSA.musicMode == true then
+                startCompositionShort(composition.name)
+            else
+                startCompositionUI(composition.name)
+            end
+        end)
+    end
+
+    local cancelCompBlock = compMenu:createBlock({id=tes3ui.registerID("RSA:CompMenu_CancelBlock")})
+    cancelCompBlock.borderTop = 6
+    cancelCompBlock.autoHeight = true
+    cancelCompBlock.autoWidth = true
+    cancelCompBlock.flowDirection = "left_to_right"
+
+    local cancelCompButtonId = tes3ui.registerID("RSA:CompMenu_CancelButton")
+    local cancelCompButton = cancelCompBlock:createButton{
+        id = cancelCompButtonId,
+        text = tes3.findGMST(tes3.gmst.sCancel).value,
+    }
+
+    cancelCompButton:register("mouseClick", function()
+            tes3ui.leaveMenuMode()
+            compMenu:destroy()
+        end
+    )
+
+end
+
 
 -- Main RSA menu --
 local RSAMenuID = tes3ui.registerID("RSA:Menu")
@@ -152,6 +253,7 @@ local function createMenu(e)
     if e.isAltDown then
         -- Check the flag, otherwise it somehow triggers twice --
         if RSAmenuCreated ~= 1 then
+            if tes3.player.data.RSA.musicMode == true or tes3.player.data.RSA.compositionPlaying == true then return end
             getPlayerData()
             if equippedInstrument == nil then return end
 
@@ -164,6 +266,13 @@ local function createMenu(e)
 
             local equippedName = equippedInstrument.name
             local title = RSAMenu:createLabel{id = tes3ui.registerID("RSA:Menu_Title"), text = equippedName}
+
+            local descrBlock = RSAMenu:createBlock({id=tes3ui.registerID("RSA:Menu_DescriptionBlock")})
+            local description = descrBlock:createLabel({id=tes3ui.registerID("RSA:Menu_Description"), text = equippedInstrument.description})
+            descrBlock.autoHeight = true
+            descrBlock.width = 360
+            descrBlock.flowDirection = "left_to_right"
+            descrBlock.wrapText = true
 
             local headerBlock = RSAMenu:createBlock({id=tes3ui.registerID("RSA:Menu_Header")})
             headerBlock.borderTop = 4
@@ -192,7 +301,7 @@ local function createMenu(e)
             local optionImprov = optionsBlock:createBlock{id = tes3ui.registerID("RSA:Menu_OptionImprov")}
             optionImprov.width = 180
             optionImprov.autoHeight = true
-            optionImprov.flowDirection = "top_to_bottom"
+            optionImprov.flowDirection = "left_to_right"
 
             local borderImprov = optionImprov:createThinBorder{}
             borderImprov.autoWidth = true
@@ -215,26 +324,72 @@ local function createMenu(e)
                     improvMenu:getContentElement().childAlignX = 0.5
                     tes3ui.enterMenuMode(improvMenuID)
 
+                    local equippedName = equippedInstrument.name
+                    local title = improvMenu:createLabel{id = tes3ui.registerID("RSA:ImprovMenu_Title"), text = equippedName}
+
+                    local descrBlock = improvMenu:createBlock({id=tes3ui.registerID("RSA:ImprovMenu_DescriptionBlock")})
+                    local description = descrBlock:createLabel({id=tes3ui.registerID("RSA:ImprovMenu_Description"), text = equippedInstrument.description})
+                    descrBlock.autoHeight = true
+                    descrBlock.width = 360
+                    descrBlock.flowDirection = "left_to_right"
+                    descrBlock.wrapText = true
+
                     local modeBlock = improvMenu:createBlock({id=tes3ui.registerID("RSA:ImprovMenu_ModeBlock")})
                     modeBlock.borderTop = 6
                     modeBlock.autoHeight = true
                     modeBlock.autoWidth = true
-                    modeBlock.flowDirection = "left_to_right"
+                    modeBlock.flowDirection = "top_to_bottom"
 
                     local modeButtonID = tes3ui.registerID("RSA:ImprovMenu_ModeButton")
 
                     for _, mode in pairs(equippedInstrument.modes) do
-                        local modeButton = modeBlock:createButton{
+                        local subBlock = modeBlock:createBlock({id = tes3ui.registerID("RSA:ImprovMenu_ModeSelect")})
+                        subBlock.autoHeight = true
+                        subBlock.autoWidth = true
+                        subBlock.flowDirection = "left_to_right"
+
+                        local iconPath = mode.icon
+                        local modeIcon = subBlock:createImage({path=iconPath})
+                        modeIcon.autoHeight = 32
+                        modeIcon.autoWidth = 32
+                        modeIcon.borderAllSides = 4
+
+                        local modeButton = subBlock:createButton{
                             id = modeButtonID,
                             text = mode.name,
                         }
+
+                        modeButton:register("help", function()
+                            local labelText = mode.description
+                            HUD.createTooltip({text = labelText})
+                        end)
+
                         modeButton:register("mouseClick", function()
                             tes3ui.leaveMenuMode()
                             improvMenu:destroy()
                             improvMenuCreated = 0
-                            startMusic()
+                            startImprov()
                         end)
                     end
+
+                    local cancelImprovBlock = improvMenu:createBlock({id=tes3ui.registerID("RSA:ImprovMenu_CancelBlock")})
+                    cancelImprovBlock.borderTop = 6
+                    cancelImprovBlock.autoHeight = true
+                    cancelImprovBlock.autoWidth = true
+                    cancelImprovBlock.flowDirection = "left_to_right"
+
+                    local cancelImprovButtonId = tes3ui.registerID("RSA:ImprovMenu_CancelButton")
+                    local cancelImprovButton = cancelImprovBlock:createButton{
+                        id = cancelImprovButtonId,
+                        text = tes3.findGMST(tes3.gmst.sCancel).value,
+                    }
+
+                    cancelImprovButton:register("mouseClick", function()
+                            tes3ui.leaveMenuMode()
+                            improvMenu:destroy()
+                            improvMenuCreated = 0
+                    end)
+
                 end
             end)
 
@@ -261,11 +416,13 @@ local function createMenu(e)
 
             local compositionButton = ImageButton.create(borderComposition, menuElementsPath.."rsa_compositionbg.dds", 128, 128)
             compositionButton:register("mouseClick", function()
-                    tes3ui.leaveMenuMode()
-                    RSAMenu:destroy()
-                    RSAmenuCreated = 0
-                    tes3.messageBox("[TODO: COMPOSITION MENU]")
-                end)
+                tes3ui.leaveMenuMode()
+                RSAMenu:destroy()
+                RSAmenuCreated = 0
+
+                createCompositionMenu()
+
+            end)
 
             local compositionIcon = borderComposition:createImage{path = compositionIconPath}
             compositionIcon.consumeMouseEvents = false
@@ -286,8 +443,8 @@ local function createMenu(e)
                 footerDivider.autoWidth=true
                 footerDivider.borderBottom = 5
                 footerDivider.borderTop = 5
-                footerDivider.imageScaleX=0.8
-                footerDivider.imageScaleY=0.8
+                footerDivider.imageScaleX=0.6
+                footerDivider.imageScaleY=0.6
                 footerDivider.color = tes3ui.getPalette("normal_color")
             --
 
@@ -314,7 +471,7 @@ local function createMenu(e)
     end
 end
 
-local function improvModeUI(e)
+local function keyController(e)
 
     if tes3.player.data.RSA.musicMode == true then
         -- Toggle between instrument modes in music mode --
@@ -330,70 +487,12 @@ local function improvModeUI(e)
                 type = timer.simulate,
                 callback = keyCheck
             }
+        elseif tes3.player.data.RSA.compositionPlaying == false then
+            createCompositionMenu()
         end
     end
 
-    if tes3.player.data.RSA.musicMode ~= true or equippedInstrument == nil or tes3.player.data.RSA.currentMode == nil then return end
-
-    local playMusic =  require("Resdayn Sonorant Apparati\\shared\\playMusic")
-    local riff1Path, riff2Path, riff3Path
-    -- Get valid riff paths from currently selected mode --
-    for _, mode in pairs(equippedInstrument.modes) do
-        if mode.name == tes3.player.data.RSA.currentMode then
-            riff1Path = mode.riff1
-            riff2Path = mode.riff2
-            riff3Path = mode.riff3
-        end
-    end
-
-    -- Keybind riff logic --
-    if e.keyCode == riffKeys.riff1 then
-        -- Remove the idle timer from previous riffs if present --
-        if animController.riffTimer then
-            animController.riffTimer:pause()
-            animController.riffTimer:cancel()
-        end
-        -- Play current riff track --
-        playMusic.playMusic(riff1Path, tes3.player)
-        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff1, tes3.animationGroup.idle9, equippedInstrument)
-
-        -- Start the idle timer --
-        animController.riffTimer = timer.start{
-            duration = tes3.player.data.RSA.riffLength,
-            callback=function()
-                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
-            end,
-            type = timer.simulate
-        }
-    elseif e.keyCode == riffKeys.riff2 then
-        if animController.riffTimer then
-            animController.riffTimer:pause()
-            animController.riffTimer:cancel()
-        end
-        playMusic.playMusic(riff2Path, tes3.player)
-        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff2, tes3.animationGroup.idle9, equippedInstrument)
-        animController.riffTimer = timer.start{
-            duration = tes3.player.data.RSA.riffLength,
-            callback=function()
-                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
-            end,
-            type = timer.simulate
-        }
-    elseif e.keyCode == riffKeys.riff3 then
-        if animController.riffTimer then
-            animController.riffTimer:pause()
-            animController.riffTimer:cancel()
-        end
-        playMusic.playMusic(riff3Path, tes3.player)
-        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff3, tes3.animationGroup.idle9, equippedInstrument)
-        animController.riffTimer = timer.start{
-            duration = tes3.player.data.RSA.riffLength,
-            callback=function()
-                animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
-            end,
-            type = timer.simulate
-        }
-    end
+    if tes3.player.data.RSA.musicMode ~= true then return end
 
     -- Vanity mode controller --
     if e.keyCode == config.vanityKey then
@@ -403,6 +502,63 @@ local function improvModeUI(e)
         else
             tes3.setVanityMode({enabled = false})
             vanityFlag = 0
+        end
+    end
+
+    if e.keyCode == config.cancelKey then
+        tes3.player.data.RSA.compositionPlaying = false
+        playMusic.removeMusic(tes3.player)
+        animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
+    end
+
+    if tes3.player.data.RSA.compositionPlaying ~= true then
+        local riff1Path, riff2Path, riff3Path
+        -- Get valid riff paths from currently selected mode --
+        for _, mode in pairs(equippedInstrument.modes) do
+            if mode.name == tes3.player.data.RSA.currentMode then
+                riff1Path = mode.riff1
+                riff2Path = mode.riff2
+                riff3Path = mode.riff3
+            end
+        end
+
+        -- Keybind riff logic --
+        if e.keyCode == riffKeys.riff1 then
+            animController.ridTimers()
+            -- Play current riff track --
+            playMusic.playMusic(riff1Path, tes3.player)
+            animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff1, tes3.animationGroup.idle9, equippedInstrument)
+
+            -- Start the idle timer --
+            animController.riffTimer = timer.start{
+                duration = tes3.player.data.RSA.riffLength,
+                callback=function()
+                    animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
+                end,
+                type = timer.simulate
+            }
+        elseif e.keyCode == riffKeys.riff2 then
+            animController.ridTimers()
+            playMusic.playMusic(riff2Path, tes3.player)
+            animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff2, tes3.animationGroup.idle9, equippedInstrument)
+            animController.riffTimer = timer.start{
+                duration = tes3.player.data.RSA.riffLength,
+                callback=function()
+                    animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
+                end,
+                type = timer.simulate
+            }
+        elseif e.keyCode == riffKeys.riff3 then
+            animController.ridTimers()
+            playMusic.playMusic(riff3Path, tes3.player)
+            animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.riff3, tes3.animationGroup.idle9, equippedInstrument)
+            animController.riffTimer = timer.start{
+                duration = tes3.player.data.RSA.riffLength,
+                callback=function()
+                    animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
+                end,
+                type = timer.simulate
+            }
         end
     end
 
@@ -419,4 +575,4 @@ event.register("uiActivated", HUD.createHUD, { filter = "MenuMulti" })
 event.register("attack", onAttacked)
 
 event.register("keyDown", createMenu, {filter = tes3.scanCode.n})
-event.register("keyDown", improvModeUI)
+event.register("keyDown", keyController)
