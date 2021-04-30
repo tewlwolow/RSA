@@ -106,17 +106,16 @@ local function getPlayerData()
     tes3.player.data.RSA.fixOrientation = tes3.player.orientation
 
     -- Get the mode index for mode switching --
-    if not tes3.player.data.RSA.modeIndex then tes3.player.data.RSA.modeIndex = 1 end
+    if not tes3.player.data.RSA.modeIndex or tes3.player.data.RSA.modeIndex == 0 or tes3.player.data.RSA.modeIndex == nil then tes3.player.data.RSA.modeIndex = 1 end
 end
 
-local function startImprov()
+local function startMusic()
     getPlayerData()
-    animController.startImprovCycle(equippedInstrument, playerMesh, tes3.player)
     HUD.createMusicModeIcon()
     local currentMode = equippedInstrument.modes[tes3.player.data.RSA.modeIndex]
     HUD.createModeIcon(currentMode)
     tes3.player.data.RSA.currentMode = currentMode.name
-    tes3.player.data.RSA.musicMode = true
+    animController.startMusicCycle(equippedInstrument, playerMesh, tes3.player)
 end
 
 local function toggleMode()
@@ -142,7 +141,7 @@ end
 local function keyCheck()
     if tes3.worldController.inputController:isKeyDown(config.musicModeKey) then
         if tes3.player.data.RSA.musicMode == false or tes3.player.data.RSA.musicMode == nil then
-            startImprov()
+            startMusic()
         end
     end
 end
@@ -233,7 +232,7 @@ local function createMenu(e)
                             tes3ui.leaveMenuMode()
                             improvMenu:destroy()
                             improvMenuCreated = 0
-                            startImprov()
+                            startMusic()
                         end)
                     end
                 end
@@ -334,7 +333,7 @@ local function improvModeUI(e)
         end
     end
 
-    if tes3.player.data.RSA.improvMode ~= true or equippedInstrument == nil or tes3.player.data.RSA.currentMode == nil then return end
+    if tes3.player.data.RSA.musicMode ~= true or equippedInstrument == nil or tes3.player.data.RSA.currentMode == nil then return end
 
     local playMusic =  require("Resdayn Sonorant Apparati\\shared\\playMusic")
     local riff1Path, riff2Path, riff3Path
@@ -409,7 +408,15 @@ local function improvModeUI(e)
 
 end
 
+local function onAttacked(e)
+    if e.targetReference == tes3.player and tes3.player.data.RSA.musicMode == true then
+        animController.cancelAnimation(playerMesh, equippedInstrument, tes3.player)
+    end
+end
+
 event.register("uiActivated", HUD.createHUD, { filter = "MenuMulti" })
+
+event.register("attack", onAttacked)
 
 event.register("keyDown", createMenu, {filter = tes3.scanCode.n})
 event.register("keyDown", improvModeUI)

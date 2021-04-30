@@ -57,63 +57,67 @@ function this.attachInstrument(actor, instrument)
 end
 
 -- Cancel animation by forcing the idle animation on actor --
-function this.cancelAnimation(e, playerMesh, instrument, actor)
-    if e.isAltDown then
+function this.cancelAnimation(playerMesh, instrument, actor)
+    tes3.player.data.RSA.musicMode = false
+    -- Remove idle animation control timer --
+    if this.riffTimer then
+        this.riffTimer:pause()
+        this.riffTimer:cancel()
+        this.riffTimer = nil
+    end
 
-        -- Remove idle animation control timer --
-        if this.riffTimer then
-            this.riffTimer:pause()
-            this.riffTimer:cancel()
-            this.riffTimer = nil
-        end
+    debugLog("Cancelling animation, player mesh: "..playerMesh)
+    tes3.playAnimation({
+        reference = actor,
+        mesh = playerMesh,
+        group = tes3.animationGroup.idle,
+        startFlag = 1
+    })
 
-        debugLog("Cancelling animation, player mesh: "..playerMesh)
-        tes3.playAnimation({
-            reference = actor,
-            mesh = playerMesh,
-            group = tes3.animationGroup.idle,
-            startFlag = 1
-        })
+    -- Reequip the instrument --
+    equipInstrument.unequip(actor)
+    equipInstrument.equip(actor, instrument)
+    equipInstrument.restoreEquipped(actor)
 
-        --Unregister event outside played RSA animation --
-        event.unregister("key", cancelCallback, cancelOptions)
-        cancelCallback, cancelOptions = nil, nil
-
-        -- Reequip the instrument --
-        equipInstrument.unequip(actor)
-        equipInstrument.equip(actor, instrument)
-        equipInstrument.restoreEquipped(actor)
-
-        tes3.player.data.RSA.improvMode = false
-        tes3.player.data.RSA.musicMode = false
-
-        local menuMulti = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
-        local musicModeBorder = menuMulti:findChild(HUD.IDs.musicModeBorder)
+    local menuMulti = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
+    local musicModeBorder = menuMulti:findChild(HUD.IDs.musicModeBorder)
+    if musicModeBorder then
         musicModeBorder.visible = false
         musicModeBorder:destroy()
-        tes3.player.data.RSA.musicMode = false
+    end
 
-        local instrumentModeBorder = menuMulti:findChild(HUD.IDs.instrumentModeBorder)
+    local instrumentModeBorder = menuMulti:findChild(HUD.IDs.instrumentModeBorder)
+    if instrumentModeBorder then
         instrumentModeBorder.visible = false
         instrumentModeBorder:destroy()
+    end
 
-        -- Remove played sound --
-        tes3.removeSound{
-            sound = tes3.player.data.RSA.currentSound,
-            reference = actor
-        }
-        tes3.player.data.RSA.currentSound = nil
+    -- Remove played sound --
+    tes3.removeSound{
+        sound = tes3.player.data.RSA.currentSound,
+        reference = actor
+    }
+    tes3.player.data.RSA.currentSound = nil
 
-        -- Reset the played mode --
-        tes3.player.data.RSA.currentMode = nil
+    -- Reset the played mode --
+    tes3.player.data.RSA.currentMode = nil
 
-        -- Reenable player controls --
-        tes3.setVanityMode({enabled = false})
-        enableControls()
+    -- Reenable player controls --
+    tes3.setVanityMode({enabled = false})
+    enableControls()
 
-        -- Fix position
-        tes3.player.position = tes3.player.data.RSA.fixPosition
-        tes3.player.orientation = tes3.player.data.RSA.fixOrientation
+    -- Fix position
+    tes3.player.position = tes3.player.data.RSA.fixPosition
+    tes3.player.orientation = tes3.player.data.RSA.fixOrientation
+
+end
+
+function this.onCancelKey(e, playerMesh, instrument, actor)
+    if e.isAltDown then
+        -- Unregister event outside played RSA animation --
+        event.unregister("key", cancelCallback, cancelOptions)
+        cancelCallback, cancelOptions = nil, nil
+        this.cancelAnimation( playerMesh, instrument, actor)
     end
 end
 
@@ -141,13 +145,18 @@ function this.playAnimation(actor, start, animType, animGroup, instrument)
 end
 
 -- The improvisation animation cycle - equip, then idle loop --
-function this.startImprovCycle(instrument, playerMesh, actor)
+function this.startMusicCycle(instrument, playerMesh, actor)
     tes3.force3rdPerson()
     disableControls()
-    tes3.player.data.RSA.improvMode = true
 
     -- Play the equip animation --
     this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.equip, tes3.animationGroup.idle8, instrument)
+
+    cancelCallback = function(e)
+        this.onCancelKey(e, playerMesh, instrument, actor)
+        end
+        cancelOptions = { filter = config.cancelKey }
+    event.register("key", cancelCallback, cancelOptions)
 
     -- Wait some then play the idle animation --
     timer.start{
@@ -155,11 +164,7 @@ function this.startImprovCycle(instrument, playerMesh, actor)
         callback=function()
             this.playAnimation(actor, tes3.animationStartFlag.immediate, instrument.animation.idle, tes3.animationGroup.idle9, instrument)
             -- Register alt+x to break the animation cycle --
-            cancelCallback = function(e)
-            this.cancelAnimation(e, playerMesh, instrument, actor)
-            end
-            cancelOptions = { filter = config.cancelKey }
-            event.register("key", cancelCallback, cancelOptions)
+            tes3.player.data.RSA.musicMode = true
         end,
         type = timer.simulate
     }
