@@ -26,13 +26,13 @@ end
 -- Keybinds for playing riffs --
 local riffMap =
 {
-    ["regular"] =
+    ["numpad"] =
     {
         riff1 = tes3.scanCode.numpad1,
         riff2 =  tes3.scanCode.numpad2,
         riff3 = tes3.scanCode.numpad3,
     },
-    ["alternative"] =
+    ["QWE"] =
     {
         riff1 = tes3.scanCode.q,
         riff2 =  tes3.scanCode.w,

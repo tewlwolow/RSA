@@ -3,7 +3,7 @@ return mwse.loadConfig("Resdayn Sonorant Apparati", {
     hitsOn = true,
     staticNamesOn = true,
     debugLogOn = false,
-    riffKeys = "regular",
+    riffKeys = "numpad",
     vanityKey = tes3.scanCode.tab,
     musicModeKey = tes3.scanCode.n,
     modeToggleKey = tes3.scanCode.numpad0,
