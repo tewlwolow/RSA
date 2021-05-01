@@ -265,6 +265,7 @@ function this.startCompositionCycleShort(instrument, actor, path)
         duration = tes3.player.data.RSA.riffLength,
         callback=function()
             this.playAnimation(tes3.player, tes3.animationStartFlag.immediate,  instrument.animation.idle, tes3.animationGroup.idle9, instrument)
+            tes3.player.data.RSA.compositionPlaying = false
         end,
         type = timer.simulate
     }
