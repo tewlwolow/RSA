@@ -60,19 +60,19 @@ this.modes = {
     ["Dunmer"] = {
         {
             name = "Bahraan",
-            description = "Bahraan is a solemn Dunmer mode.",
+            description = "Bahraan (\"a pilgrimage\") is a solemn Dunmer mode, a core element of the \"morhbaldefur\" genre, inspired in form by the ancient Dunmeri poetry.\nIts odic interpretation is commonly rendered as:\n*** A comet draws closer (the stars guide the way), the mushroom land rests in void (shrouded in impenetrable darkness), when a comet rises again, the sun's warmth will embrace us. ***",
             icon = "Icons\\RSA\\ui\\hud\\modes\\Dunmer\\rsa_bahraanicon.tga"
         },
         {
             name = "Luvasi",
-            description = "Luvasi is a romantic Dunmer mode.",
+            description = "Luvasi is a mystic Dunmer mode, commonly associated with magic, mystery, and the Frame-maker (Lorkhan).\nThe name comes from the ancient Chimeri and was presumably used in reference to one or more objects used in the occult rituals to Boethiah.\nIts odic interpretation is commonly rendered as:\n*** Moonlight's magic illuminates a parasol tree;\ncomet and stars gleaming against the dark sky. ***",
             icon = "Icons\\RSA\\ui\\hud\\modes\\Dunmer\\rsa_luvasiicon.tga"
-        },
+        },--[[
         {
             name = "Ruhn Kelak",
             description = "Ruhn Kelak is a vigorous Dunmer mode.",
             icon = "Icons\\RSA\\ui\\hud\\modes\\Dunmer\\rsa_ruhnkelakicon.tga"
-        },
+        },]]
     },
 }
 
@@ -1528,6 +1528,7 @@ this.instruments = {
                 riff2 = "",
                 riff3 = "",
             },
+            --[[    TO DO -> smarter detection here
             {
                 name = "",
                 description = "",
@@ -1536,13 +1537,18 @@ this.instruments = {
                 riff2 = "",
                 riff3 = "",
 
-            },
+            },]]
         },
         compositions = {
             {
                 name = "Lleri Mok",
                 path = "Vo\\RSA\\Dunmer\\zuileyr\\compositions\\rsa_zuileyr_lleri-mok.mp3",
-                description = "This traditional composition in Bahraan mode can be tracked back centuries. The song harks back to the hardship the Velothi people had to suffer on their migration path to Resdayn."
+                description = "This composition in Bahraan mode, roughly meaning \"a secluded inlet\" in ancient Dunmeri, can be tracked back centuries. This reasonably complex piece encapsulates the core elements of the Great Despair - weariness, searching, and darkness."
+            },
+            {
+                name = "Oad Juzei",
+                path = "Vo\\RSA\\Dunmer\\zuileyr\\compositions\\rsa_zuileyr_oad-juzei.mp3",
+                description = "Oad Juzei, or \"a river-like opening\", captures the essence of the Luvasi mode, evoking mysterious sensations bordering on the otherwordly.\nThe name originates from the Daedric rituals in the Chimeri age, during which the \"divine mathematics\" would flow from the celestial architecture like a rapid stream of liquid."
             },
         },
         requirements = nil,
@@ -1575,8 +1581,8 @@ this.instruments = {
                 riff1 = "",
                 riff2 = "",
                 riff3 = "",
-                },
-            {
+            },
+                --[[{
                 name = "",
                 description = "",
                 icon = "",
@@ -1584,13 +1590,18 @@ this.instruments = {
                 riff2 = "",
                 riff3 = "",
 
-            },
+            },]]
         },
         compositions = {
             {
                 name = "Lleri Mok",
                 path = "Vo\\RSA\\Dunmer\\zuileyr\\compositions\\rsa_zuileyr_lleri-mok.mp3",
-                description = "This traditional composition in Bahraan mode can be tracked back centuries. The song harks back to the hardship the Velothi people had to suffer on their migration path to Resdayn."
+                description = "This composition in Bahraan mode, roughly meaning \"a secluded inlet\" in ancient Dunmeri, can be tracked back centuries. This reasonably complex piece encapsulates the core elements of the Great Despair - weariness, searching, and darkness."
+            },
+            {
+                name = "Oad Juzei",
+                path = "Vo\\RSA\\Dunmer\\zuileyr\\compositions\\rsa_zuileyr_oad-juzei.mp3",
+                description = "Oad Juzei, or \"a river-like opening\", captures the essence of the Luvasi mode, evoking mysterious sensations bordering on the otherwordly.\nThe name originates from the Daedric rituals in the Chimeri age, during which the \"divine mathematics\" would flow from the celestial architecture like a rapid stream of liquid."
             },
         },
         requirements = nil,
