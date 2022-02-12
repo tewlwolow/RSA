@@ -39,7 +39,6 @@ local riffMap =
         riff3 = tes3.scanCode.e,
     },
 }
-local riffKeys = riffMap[config.riffKeys]
 
 -- Image buttons from UI Expansion --
 function ImageButton.over(e)
@@ -186,7 +185,7 @@ end
 
 -- Music mode check and register --
 local function keyCheck()
-    if tes3.worldController.inputController:isKeyDown(config.musicModeKey) then
+    if tes3.worldController.inputController:isKeyDown(config.musicModeKey.keyCode) then
         if tes3.player.data.RSA.musicMode == false or tes3.player.data.RSA.musicMode == nil then
             getPlayerData()
             startImprov()
@@ -494,15 +493,17 @@ end
 -- This is the main function controlling key hits --
 local function keyController(e)
 
+    if not tes3.player then return end
+
     -- Toggle between instrument modes in music mode --
     if tes3.player.data.RSA.musicMode == true then
-        if e.keyCode == config.modeToggleKey then
+        if e.keyCode == config.modeToggleKey.keyCode then
             toggleMode()
         end
     end
 
     -- Controls whether we should enter improvisation mode if not in music mode at all or create composition menu inside music mode --
-    if e.keyCode == config.musicModeKey then
+    if e.keyCode == config.musicModeKey.keyCode then
         if tes3.player.data.RSA.musicMode == false or not tes3.player.data.RSA.musicMode then
             timer.start{
                 duration = 2,
@@ -518,7 +519,7 @@ local function keyController(e)
     if tes3.player.data.RSA.musicMode ~= true then return end
 
     -- Vanity mode controller --
-    if e.keyCode == config.vanityKey then
+    if e.keyCode == config.vanityKey.keyCode then
         if vanityFlag == 0 then
             tes3.setVanityMode({enabled = true})
             vanityFlag = 1
@@ -529,14 +530,15 @@ local function keyController(e)
     end
 
     -- Cancel playing at any time --
-    if e.keyCode == config.cancelKey then
+    if e.keyCode == config.cancelKey.keyCode then
         tes3.player.data.RSA.compositionPlaying = false
         playMusic.removeMusic(tes3.player)
         animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
     end
 
-    -- The following control playing riffs --
+    -- THe followign control playing riffs --
     if tes3.player.data.RSA.compositionPlaying ~= true then
+        local riffKeys = riffMap[config.riffKeys]
         local riff1Path, riff2Path, riff3Path
         -- Get valid riff paths from currently selected mode --
         for _, mode in pairs(equippedInstrument.modes) do
