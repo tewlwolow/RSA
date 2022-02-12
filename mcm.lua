@@ -15,9 +15,9 @@ local template = mwse.mcm.createTemplate{
     name="Resdayn Sonorant Apparati",
     headerImagePath="\\Textures\\RSA\\RSA_logo.tga"}
 
-    local page = template:createPage{label="Main Settings", noScroll=true}
+    local page = template:createPage{label="Main Settings", noScroll=false}
     page:createCategory{
-        label = "Resdayn Sonorant Apparati "..version.." by insicht, Leyawynn, and tewlwolow.\nMain lua core.\n\nSettings:",
+        label = "Resdayn Sonorant Apparati "..version.." by insicht and tewlwolow.\nSettings:",
     }
 
     page:createYesNoButton{
@@ -47,7 +47,7 @@ local template = mwse.mcm.createTemplate{
     page:createDropdown{
         label = "Choose a keybind map to play riffs with:",
         options = {
-            {label = "Numpad 1-2-3(default)", value = "numpad"},
+            {label = "Numpad 1-2-3 (default)", value = "numpad"},
             {label = "Q-W-E", value = "QWE"},
         },
         variable=registerVariable("riffKeys")
@@ -67,7 +67,7 @@ local template = mwse.mcm.createTemplate{
     }
 
     page:createKeyBinder{
-        label = "This is the cancel key. Press alt+key in the music mode to switch the music mode off and get back to regular playing\nPressing this key in the music mode will stop the currently played riff or composition.\nDefault = X.",
+        label = "This is the cancel key. Press this key in the music mode to stop the currently played riff or composition.\nPress alt+key in the music mode to switch the music mode off\nDefault = X.",
         allowCombinations = false,
         variable = registerVariable("cancelKey"),
     }
