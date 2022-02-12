@@ -75,6 +75,7 @@ function this.attachInstrument(actor, instrument)
         debugLog("Attach Instrument node is nil!")
     end
     debugLog("Instrument attached.")
+
 end
 
 -- This function controls getting out of music mode by cancelling animations --
@@ -166,12 +167,20 @@ function this.playAnimation(actor, start, animType, animGroup, instrument)
         startFlag = start,
     })
 
+    tes3.player.position = tes3.player.data.RSA.fixPosition
+    tes3.player.orientation = tes3.player.data.RSA.fixOrientation
+
     -- Attach the instrument --
     this.attachInstrument(actor, instrument)
 
-    -- Fix position again, because Todd --
     tes3.player.position = tes3.player.data.RSA.fixPosition
     tes3.player.orientation = tes3.player.data.RSA.fixOrientation
+
+    -- Fix position again, because Todd --
+    timer.delayOneFrame(function()
+        tes3.player.position = tes3.player.data.RSA.fixPosition
+        tes3.player.orientation = tes3.player.data.RSA.fixOrientation
+    end)
 end
 
 -- The improvisation animation cycle - equip, then idle loop --
@@ -193,7 +202,7 @@ function this.startImprovCycle(instrument, playerMesh, actor)
     cancelCallback = function(e)
         this.onCancelKey(e, playerMesh, instrument, actor)
         end
-        cancelOptions = { filter = config.cancelKey }
+        cancelOptions = { filter = config.cancelKey.keyCode }
     event.register("key", cancelCallback, cancelOptions)
 
     -- Wait some then play the idle animation --
@@ -223,7 +232,7 @@ function this.startCompositionCycle(instrument, playerMesh, actor, path)
     cancelCallback = function(e)
         this.onCancelKey(e, playerMesh, instrument, actor)
         end
-        cancelOptions = { filter = config.cancelKey }
+        cancelOptions = { filter = config.cancelKey.keyCode }
     event.register("key", cancelCallback, cancelOptions)
 
     -- Wait some then play the composition animation --
