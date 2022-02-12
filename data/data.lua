@@ -60,12 +60,12 @@ this.modes = {
     ["Dunmer"] = {
         {
             name = "Bahraan",
-            description = "Bahraan (\"a pilgrimage\") is a solemn Dunmer mode, a core element of the \"morhbaldefur\" genre, inspired in form by the ancient Dunmeri poetry.\nIts odic interpretation is commonly rendered as:\n*** A comet draws closer (the stars guide the way), the mushroom land rests in void (shrouded in impenetrable darkness), when a comet rises again, the sun's warmth will embrace us. ***",
+            description = "Bahraan (\"a pilgrimage\") is a solemn Dunmer mode, a core element of the \"morhbaldefur\" genre, inspired in form by the ancient Dunmeri poetry.\n\nOdic reading:\nA comet draws closer;\nThe stars guide the way,\nThe mushroom land rests in void.\nWhen the comet rises again;\nthe sun's warmth will embrace us.",
             icon = "Icons\\RSA\\ui\\hud\\modes\\Dunmer\\rsa_bahraanicon.tga"
         },
         {
             name = "Luvasi",
-            description = "Luvasi is a mystic Dunmer mode, commonly associated with magic, mystery, and the Frame-maker (Lorkhan).\nThe name comes from the ancient Chimeri and was presumably used in reference to one or more objects used in the occult rituals to Boethiah.\nIts odic interpretation is commonly rendered as:\n*** Moonlight's magic illuminates a parasol tree;\ncomet and stars gleaming against the dark sky. ***",
+            description = "Luvasi is a mystic Dunmer mode, commonly associated with magic, mystery, and the Frame-maker (Lorkhan).\nThe name comes from the ancient Chimeri and was presumably used in reference to one or more objects used in the occult rituals to Boethiah.\n\nOdic reading:\nMoonlight's magic illuminates a parasol tree;\ncomet and stars gleam against the dark sky.",
             icon = "Icons\\RSA\\ui\\hud\\modes\\Dunmer\\rsa_luvasiicon.tga"
         },--[[
         {
