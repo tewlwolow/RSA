@@ -536,7 +536,7 @@ local function keyController(e)
         animController.playAnimation(tes3.player, tes3.animationStartFlag.immediate, equippedInstrument.animation.idle, tes3.animationGroup.idle9, equippedInstrument)
     end
 
-    -- THe followign control playing riffs --
+    -- THe following control playing riffs --
     if tes3.player.data.RSA.compositionPlaying ~= true then
         local riffKeys = riffMap[config.riffKeys]
         local riff1Path, riff2Path, riff3Path
